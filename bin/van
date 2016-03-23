@@ -3,7 +3,7 @@
 function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
-  source "$shome/exec/akw_common"
+  source "$shome/exec/inception"
 
   export BASEBOX_INSTANCE="$(basename "$BASH_SOURCE")"
 
@@ -13,7 +13,7 @@ function main {
   export BASEBOX_IP="${!nm_ip}"
   export BASEBOX_DOCKER_NETWORK_PREFIX="${!nm_docker}"
 
-  exec akw "$@"
+  exec dream "$@"
 }
 
 source sub "$BASH_SOURCE" "$@"

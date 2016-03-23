@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+export BOX_NAME='dream'
+export BASEBOX_NAME='inception'
+export BASEBOX_HOME_URL='git@github.com:defn/home'
+
+export BASEBOX_NETWORK_PREFIX='172.28.128'
+
+export IP_van="${BASEBOX_NETWORK_PREFIX}.4"
+export DOCKER_NETWORK_PREFIX_van='172.204.4'
+
+export IP_hotel="${BASEBOX_NETWORK_PREFIX}.5"
+export DOCKER_NETWORK_PREFIX_hotel='172.204.5'
+
+export IP_fortress="${BASEBOX_NETWORK_PREFIX}.6"
+export DOCKER_NETWORK_PREFIX_fortress='172.204.6'
