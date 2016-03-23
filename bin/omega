@@ -7,6 +7,7 @@ function main {
 
   export BASEBOX_INSTANCE="$(basename "$BASH_SOURCE")"
   export BASEBOX_IP="${BASEBOX_NETWORK_PREFIX}.6"
+  export BASEBOX_DOCKER_NETWORK_PREFIX="172.204.6"
   exec akw "$@"
 }
 
