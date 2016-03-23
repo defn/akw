@@ -6,8 +6,13 @@ function main {
   source "$shome/exec/akw_common"
 
   export BASEBOX_INSTANCE="$(basename "$BASH_SOURCE")"
-  export BASEBOX_IP="${BASEBOX_NETWORK_PREFIX}.4"
-  export BASEBOX_DOCKER_NETWORK_PREFIX="172.204.4"
+
+  local nm_ip="IP_${BASEBOX_INSTANCE}"
+  local nm_docker="DOCKER_NETWORK_PREFIX_${BASEBOX_INSTANCE}"
+
+  export BASEBOX_IP="${!nm_ip}"
+  export BASEBOX_DOCKER_NETWORK_PREFIX="${!nm_docker}"
+
   exec akw "$@"
 }
 

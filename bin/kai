@@ -1,14 +1,1 @@
-#!/usr/bin/env bash
-
-function main {
-  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
-  source "$shome/script/profile"
-  source "$shome/exec/akw_common"
-
-  export BASEBOX_INSTANCE="$(basename "$BASH_SOURCE")"
-  export BASEBOX_IP="${BASEBOX_NETWORK_PREFIX}.5"
-  export BASEBOX_DOCKER_NETWORK_PREFIX="172.204.5"
-  exec akw "$@"
-}
-
-source sub "$BASH_SOURCE" "$@"
+alpha
