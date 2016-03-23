@@ -7,8 +7,8 @@ function main {
 
   export BASEBOX_INSTANCE="$(basename "$BASH_SOURCE")"
 
-  local nm_ip="IP_${BASEBOX_INSTANCE}"
-  local nm_docker="DOCKER_NETWORK_PREFIX_${BASEBOX_INSTANCE}"
+  local nm_ip="DREAM_IP_${BASEBOX_INSTANCE}"
+  local nm_docker="DREAM_NETWORK_PREFIX_${BASEBOX_INSTANCE}"
 
   export BASEBOX_IP="${!nm_ip}"
   export BASEBOX_DOCKER_NETWORK_PREFIX="${!nm_docker}"
