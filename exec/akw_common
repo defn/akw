@@ -3,3 +3,4 @@
 export BOX_NAME='fn'
 export BASEBOX_NAME='defn'
 export BASEBOX_HOME_URL='git@github.com:defn/home'
+export BASEBOX_NETWORK_PREFIX='172.28.128'

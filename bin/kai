@@ -6,7 +6,7 @@ function main {
   source "$shome/exec/akw_common"
 
   export BASEBOX_INSTANCE="$(basename "$BASH_SOURCE")"
-  export BASEBOX_IP='172.28.128.5'
+  export BASEBOX_IP="${BASEBOX_NETWORK_PREFIX}.5"
   exec akw "$@"
 }
 
