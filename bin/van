@@ -12,7 +12,7 @@ function main {
 
   export BASEBOX_IP="${!nm_ip}"
   export BASEBOX_DOCKER_NETWORK_PREFIX="${!nm_docker}"
-
+  
   exec dream "$@"
 }
 

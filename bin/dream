@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-function main {
-  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
-  source "$shome/script/profile"
-  source "$shome/exec/inception"
+_shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
+source "$_shome/script/profile"
+source "$_shome/exec/inception"
 
+function main {
   exec limbo "$@"
 }
 
