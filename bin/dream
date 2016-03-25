@@ -1,11 +1,1 @@
-#!/usr/bin/env bash
-
-_shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
-source "$_shome/script/profile"
-source "$_shome/exec/inception"
-
-function main {
-  exec limbo "$@"
-}
-
-source sub "$BASH_SOURCE" "$@"
+../script/limboX
