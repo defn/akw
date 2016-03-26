@@ -12,7 +12,6 @@ export DREAM_NETWORK_PREFIX_reality="${DREAM_NETWORK_PREFIX}.1"
 case "$(uname -s)" in
   Darwin)
     export DREAM_NETWORK_PREFIX_reality="${DREAM_NETWORK_PREFIX}.3"
-    export BASEBOX_DOCKER_OCTET="3"
     ;;
 esac
 
