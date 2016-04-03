@@ -12,8 +12,27 @@ function main {
 
   export BASEBOX_IP="${!nm_ip}"
   export BASEBOX_DOCKER_NETWORK_PREFIX="${!nm_docker}"
-  
-  exec limbo "$@"
+
+  case "$BASEBOX_INSTANCE" in
+    reality)
+      case "${1:-}" in
+        dream)
+          exec limbo "$@"
+          ;;
+        build)
+          cd
+          block cibuild
+          ;;
+        *)
+          echo "ERROR: ${1:-} is not supported in reality" 1>&2
+          return 1
+          ;;
+        esac
+      ;;
+    *)
+      exec limbo "$@"
+      ;;
+  esac
 }
 
 source sub "$BASH_SOURCE" "$@"
