@@ -3,11 +3,10 @@ Builds
 
 Only on OSX, bring up a limbo to host the dreams:
 
-    runmany 'dream $1' media build export rebuild
+    runmany 'reality $1' update media build export rebuild
 
 Then on Ubuntu or OSX, build the dreams:
 
-    reality update
     runmany 'reality dream $1' media build export rebuild
 
 Then the various limbos can come up with their dreams:
