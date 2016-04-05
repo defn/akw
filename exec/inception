@@ -7,13 +7,8 @@ export BASEBOX_HOME_URL='git@github.com:defn/home'
 export DREAM_NETWORK_PREFIX='172.29'
 export BASEBOX_NETWORK_PREFIX='172.28.128'
 
-export DREAM_IP_reality="${BASEBOX_NETWORK_PREFIX}.1"
-export DREAM_NETWORK_PREFIX_reality="${DREAM_NETWORK_PREFIX}.1"
-case "$(uname -s)" in
-  Darwin)
-    export DREAM_NETWORK_PREFIX_reality="${DREAM_NETWORK_PREFIX}.3"
-    ;;
-esac
+export DREAM_IP_reality="${BASEBOX_NETWORK_PREFIX}.3"
+export DREAM_NETWORK_PREFIX_reality="${DREAM_NETWORK_PREFIX}.3"
 
 export DREAM_IP_dream="${BASEBOX_NETWORK_PREFIX}.3"
 export DREAM_NETWORK_PREFIX_dream="${DREAM_NETWORK_PREFIX}.3"
