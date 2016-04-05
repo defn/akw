@@ -18,9 +18,6 @@ case "$(uname -s)" in
     ;;
 esac
 
-export DREAM_IP_dream="${BASEBOX_NETWORK_PREFIX}.3"
-export DREAM_NETWORK_PREFIX_dream="${DREAM_NETWORK_PREFIX}.3"
-
 export DREAM_IP_van="${BASEBOX_NETWORK_PREFIX}.4"
 export DREAM_NETWORK_PREFIX_van="${DREAM_NETWORK_PREFIX}.4"
 
