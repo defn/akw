@@ -13,22 +13,7 @@ function main {
   export BASEBOX_IP="${!nm_ip}"
   export BASEBOX_DOCKER_NETWORK_PREFIX="${!nm_docker}"
 
-  case "$BASEBOX_INSTANCE" in
-    reality)
-      case "${1:-}" in
-        build)
-          cd
-          exec block cibuild
-          ;;
-        *)
-          exec limbo "$@"
-          ;;
-        esac
-      ;;
-    *)
-      exec limbo "$@"
-      ;;
-  esac
+  exec limbo "$@"
 }
 
 source sub "$BASH_SOURCE" "$@"
