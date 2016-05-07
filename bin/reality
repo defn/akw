@@ -1,1 +1,24 @@
-../script/limboX
+#!/usr/bin/env bash
+
+function main {
+  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
+  source "$shome/script/profile"
+  source "$shome/exec/inception"
+
+  case "$(uname -s)" in
+    Darwin)
+      export BASEBOX_IP="172.28.128.3"
+      export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.3"
+      ;;
+    *)
+      export BASEBOX_IP="172.28.128.1"
+      export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.1"
+      ;;
+  esac
+
+  export BASEBOX_INSTANCE='reality'
+
+  exec limbo virtualbox "$@"
+}
+
+source sub "$BASH_SOURCE" "$@"
