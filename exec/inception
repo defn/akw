@@ -17,12 +17,16 @@ case "$(uname -s)" in
     export DREAM_NETWORK_PREFIX_reality="${DREAM_NETWORK_PREFIX}.1"
     ;;
 esac
+export DREAM_PROVIDER_reality='virtualbox'
 
 export DREAM_IP_van="${BASEBOX_NETWORK_PREFIX}.4"
 export DREAM_NETWORK_PREFIX_van="${DREAM_NETWORK_PREFIX}.4"
+export DREAM_PROVIDER_van='virtualbox'
 
 export DREAM_IP_hotel="${BASEBOX_NETWORK_PREFIX}.5"
 export DREAM_NETWORK_PREFIX_hotel="${DREAM_NETWORK_PREFIX}.5"
+export DREAM_PROVIDER_hotel='vmware'
 
 export DREAM_IP_fortress="${BASEBOX_NETWORK_PREFIX}.6"
 export DREAM_NETWORK_PREFIX_fortress="${DREAM_NETWORK_PREFIX}.6"
+export DREAM_PROVIDER_fortress='parallels'
