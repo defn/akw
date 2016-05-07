@@ -6,10 +6,10 @@ function main {
   source "$shome/exec/inception"
 
 	export BASEBOX_INSTANCE='hotel'
-	export BASEBOX_IP="172.28.129.5"
+	export BASEBOX_IP="172.28.128.5"
 	export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.5"
 
-  exec limbo vmware "$@"
+  exec limbo virtualbox "$@"
 }
 
 source sub "$BASH_SOURCE" "$@"
