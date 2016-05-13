@@ -3,9 +3,10 @@
 function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
-  source "$shome/exec/inception"
 
-  limbo update
+  reality swarm primary
+  reality swarm consul
+  runmany '$1 swarm' van hotel fortress
 }
 
 source sub "$BASH_SOURCE" "$@"

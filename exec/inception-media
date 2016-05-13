@@ -4,7 +4,7 @@ function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
 
-  exec reality "$(basename "${BASH_SOURCE}")" "$@"
+  reality rebase export rebuild
 }
 
 source sub "$BASH_SOURCE" "$@"
