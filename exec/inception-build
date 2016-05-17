@@ -5,7 +5,7 @@ function main {
   source "$shome/script/profile"
 
   runmany 'reality $1' recycle 'swarm primary'
-  runmany '$1 recycle; $1 swarm' van hotel fortress
+  runmany '$1 recycle; $1 swarm node' van hotel fortress
 }
 
 source sub "$BASH_SOURCE" "$@"
