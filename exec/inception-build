@@ -4,6 +4,7 @@ function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
 
+  export CONSUL_SERVER='172.28.128.1'
   runmany 'reality $1' recycle 'swarm primary'
   runmany '$1 recycle; $1 swarm node' van hotel fortress
 }
