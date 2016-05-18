@@ -7,6 +7,8 @@ function main {
   export CONSUL_SERVER='172.28.128.1'
   runmany 'reality $1' recycle 'swarm primary'
   runmany '$1 recycle; $1 swarm node' van hotel fortress
+  docker machine ls
+  inception swarm network create inception
 }
 
 source sub "$BASH_SOURCE" "$@"
