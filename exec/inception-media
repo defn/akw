@@ -4,6 +4,7 @@ function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
 
+  inception destroy -f
   runmany 'plane $1' rebase reuse
 }
 
