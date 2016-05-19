@@ -5,18 +5,16 @@ function main {
   source "$shome/script/profile"
   source "$shome/exec/inception"
 
+  export BASEBOX_INSTANCE='plane'
+  export BASEBOX_IP="172.28.128.1"
+  export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.1"
+
   case "$(uname -s)" in
     Darwin)
       export BASEBOX_IP="172.28.128.3"
       export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.3"
       ;;
-    *)
-      export BASEBOX_IP="172.28.128.1"
-      export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.1"
-      ;;
   esac
-
-  export BASEBOX_INSTANCE='reality'
 
   exec limbo virtualbox "$@"
 }

@@ -5,7 +5,7 @@ function main {
   source "$shome/script/profile"
 
   sudo true
-  runmany 10 'docker machine rm -f $1; $1 destroy -f' van hotel fortress reality
+  runmany 10 'docker machine rm -f $1; $1 destroy -f' plane van hotel snow
 }
 
 source sub "$BASH_SOURCE" "$@"
