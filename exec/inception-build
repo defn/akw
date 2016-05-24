@@ -7,7 +7,7 @@ function main {
   export CONSUL_SERVER='172.28.128.1'
   runmany 'docker machine rm -f $1 2>&- || true' plane van hotel snow
   runmany 'plane $1' recycle 'swarm primary'
-  runmany '$1 recycle; $1 swarm replica ' van hotel snow
+  runmany '$1 recycle; $1 swarm node' van hotel snow
   docker machine ls
   inception network create inception
 }
