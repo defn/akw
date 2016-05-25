@@ -8,7 +8,7 @@ function main {
   runmany 'plane $1' recycle 'swarm primary'
   runmany '$1 recycle; $1 swarm node' van hotel snow
   docker machine ls
-  inception network create inception
+  inception network create inception || true
 }
 
 source sub "$BASH_SOURCE" "$@"
