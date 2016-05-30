@@ -6,6 +6,7 @@ function main {
 
   inception destroy -f
   runmany 'plane $1' rebase reuse
+  plane reuse vagrant
 }
 
 source sub "$BASH_SOURCE" "$@"
