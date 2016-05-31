@@ -7,7 +7,14 @@ function main {
 
   export BASEBOX_INSTANCE='plane'
 
-  export BASEBOX_IP="172.28.128.3"
+  case "$(uname -s)" in
+    Darwin)
+      export BASEBOX_IP="172.28.128.3"
+      ;;
+    Linux)
+      export BASEBOX_IP="172.28.128.1"
+      ;;
+  esac
   export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.3"
 
   exec limbo virtualbox "$@"
