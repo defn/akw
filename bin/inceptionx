@@ -3,8 +3,9 @@
 function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
+  source "$shome/exec/inceptionx"
 
-  eval $(planex docker machine env --swarm --no-proxy planex)
+  eval $($PLANE docker machine env --swarm --no-proxy $PLANE)
   exec docker "$@"
 }
 

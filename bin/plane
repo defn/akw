@@ -5,7 +5,7 @@ function main {
   source "$shome/script/profile"
   source "$shome/exec/inception"
 
-  export BASEBOX_INSTANCE='plane'
+  export BASEBOX_INSTANCE=$PLANE
 
   case "$(uname -s)" in
     Darwin)

@@ -5,7 +5,7 @@ function main {
   source "$shome/script/profile"
   source "$shome/exec/inception"
 
-  export BASEBOX_INSTANCE='snow'
+  export BASEBOX_INSTANCE=$SNOW
   export BASEBOX_IP="172.28.128.6"
   export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.6"
 

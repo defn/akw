@@ -3,9 +3,9 @@
 function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
-  source "$shome/exec/inception"
+  source "$shome/exec/inceptionx"
 
-  export BASEBOX_INSTANCE='planex'
+  export BASEBOX_INSTANCE=$PLANE
 
   case "$(uname -s)" in
     Darwin)

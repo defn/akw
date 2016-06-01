@@ -4,13 +4,13 @@ function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
 
-  runmany 4 'docker machine rm -f $1 2>&- || true; $1 recycle; $1 swarm node' plane van hotel snow
+  runmany 4 'docker machine rm -f $1 2>&- || true; $1 recycle; $1 swarm node' $PLANE $VAN $HOTEL $SNOW
 
-  plane swarm primary
-  runmany 3 '$1 swarm node' plane van hotel snow
+  $PLANE swarm primary
+  runmany 3 '$1 swarm node' $PLANE $VAN $HOTEL $SNOW
 
   docker machine ls
-  inception network create inception || true
+  $INCEPTION network create inception || true
 }
 
 source sub "$BASH_SOURCE" "$@"

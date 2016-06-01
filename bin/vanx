@@ -3,9 +3,9 @@
 function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
-  source "$shome/exec/inception"
+  source "$shome/exec/inceptionx"
 
-  export BASEBOX_INSTANCE='vanx'
+  export BASEBOX_INSTANCE=$VAN
   export BASEBOX_IP="172.28.129.4"
   export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.14"
 
