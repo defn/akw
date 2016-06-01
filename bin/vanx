@@ -5,11 +5,11 @@ function main {
   source "$shome/script/profile"
   source "$shome/exec/inception"
 
-  export BASEBOX_INSTANCE='hotel'
-  export BASEBOX_IP="172.28.128.5"
-  export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.5"
+  export BASEBOX_INSTANCE='vanx'
+  export BASEBOX_IP="172.28.129.4"
+  export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.14"
 
-  exec limbo virtualbox "$@"
+  exec limbo vmware "$@"
 }
 
 source sub "$BASH_SOURCE" "$@"
