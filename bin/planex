@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+function main {
+  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
+  source "$shome/script/profile"
+  source "$shome/exec/inception"
+
+  export BASEBOX_INSTANCE='planex'
+
+  case "$(uname -s)" in
+    Darwin)
+      export BASEBOX_IP="172.28.129.3"
+      ;;
+    Linux)
+      export BASEBOX_IP="172.28.129.1"
+      ;;
+  esac
+  export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.13"
+
+  exec limbo vmware "$@"
+}
+
+source sub "$BASH_SOURCE" "$@"
