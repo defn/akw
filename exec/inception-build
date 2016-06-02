@@ -7,7 +7,7 @@ function main {
   runmany 4 'docker machine rm -f $1 2>&- || true; $1 recycle; $1 swarm node' $PLANE $VAN $HOTEL $SNOW
 
   $PLANE swarm primary
-  runmany 3 '$1 swarm node' $PLANE $VAN $HOTEL $SNOW
+  runmany 3 '$1 swarm node' $VAN $HOTEL $SNOW
 
   docker machine ls
   $INCEPTION network create inception || true
