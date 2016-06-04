@@ -5,8 +5,9 @@ function main {
   source "$shome/script/profile"
 
   $INCEPTION destroy -f
-  runmany "$PLANE"' $1' rebase reuse
-  $PLANE reuse vagrant
+  runmany "$PLANE"' $1' rebase
+  runmany "$PLANE"' docker image $1' rebase reuse
+  runmany "$PLANE"' $1' reuse
 }
 
 source sub "$BASH_SOURCE" "$@"
