@@ -6,6 +6,7 @@ function main {
 
   $INCEPTION destroy -f
   $PLANE rebase
+  $PLANE swarm primary
   $PLANE docker image rebase
   $PLANE docker image reuse
   $PLANE reuse
