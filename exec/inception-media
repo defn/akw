@@ -5,9 +5,11 @@ function main {
   source "$shome/script/profile"
 
   $INCEPTION destroy -f
-  runmany "$PLANE"' $1' rebase
-  runmany "$PLANE"' docker image $1' rebase reuse
-  runmany "$PLANE"' $1' reuse
+  $PLANE rebase
+  $PLANE docker image rebase
+  $PLANE docker image reuse
+  $PLANE reuse
+  $INCEPTION destroy -f
 }
 
 source sub "$BASH_SOURCE" "$@"
