@@ -6,10 +6,18 @@ function main {
 
   $INCEPTION destroy -f
   $PLANE rebase
+  $PLANE reuse vagrant
+
+  $PLANE recycle
   $PLANE swarm primary
   $PLANE docker image rebase
   $PLANE docker image reuse
-  $PLANE reuse
+
+  $PLANE recycle
+  $PLANE swarm primary
+  $PLANE docker image import
+  $PLANE reuse docker
+
   $INCEPTION destroy -f
 }
 
