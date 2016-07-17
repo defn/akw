@@ -5,6 +5,7 @@ function main {
   source "$shome/script/profile"
 
   $INCEPTION destroy -f
+  VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage unregistervm --delete $1'
   $PLANE rebase
   $PLANE reuse vagrant
 
