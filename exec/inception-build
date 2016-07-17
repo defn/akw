@@ -13,7 +13,7 @@ function main {
         ;;
       
       *)
-        docker machine rm -f $1 2>&- || true
+        docker machine rm -f $a 2>&- || true
         $a recycle
         $a swarm node
         ;;
