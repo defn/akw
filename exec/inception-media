@@ -19,6 +19,7 @@ function main {
   $PLANE reuse docker
 
   $INCEPTION destroy -f
+  VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage unregistervm --delete $1'
 }
 
 source sub "$BASH_SOURCE" "$@"
