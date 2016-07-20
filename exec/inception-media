@@ -5,7 +5,7 @@ function main {
   source "$shome/script/profile"
 
   $INCEPTION destroy -f
-  VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage unregistervm --delete $1'
+  VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
   $PLANE rebase
   $PLANE reuse vagrant
 
@@ -20,7 +20,7 @@ function main {
   $PLANE reuse docker
 
   $INCEPTION destroy -f
-  VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage unregistervm --delete $1'
+  VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
 }
 
 source sub "$BASH_SOURCE" "$@"
