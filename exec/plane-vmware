@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+export BASEBOX_INSTANCE='plane'
+
+case "$(uname -s)" in
+  Darwin)
+    export BASEBOX_IP="172.28.129.3"
+    ;;
+  Linux)
+    export BASEBOX_IP="172.28.129.1"
+    ;;
+esac
+export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.13"
+
+export INCEPTION_PROVIDER='vmware'
+
+exec sub-middleware "$BASH_SOURCE" "$@"

@@ -1,15 +1,4 @@
 #!/usr/bin/env bash
 
-function main {
-  local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
-  source "$shome/script/profile"
-  source "$shome/exec/inception"
-
-  export BASEBOX_INSTANCE=$PLANE
-  export BASEBOX_IP="172.28.128.3"
-  export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.3"
-
-  exec limbo virtualbox "$@"
-}
-
-source sub "$BASH_SOURCE" "$@"
+unset SUB_MIDDLEWARE
+source sub-middleware "$BASH_SOURCE" "$@"
