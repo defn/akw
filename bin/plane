@@ -8,5 +8,4 @@ function main {
   exec limbo "${INCEPTION_PROVIDER}" "$@"
 }
 
-export SUB_MIDDLEWARE="${BASH_SOURCE##*/}"
-source sub "$BASH_SOURCE" "$@"
+source sub-chain "$BASH_SOURCE" "$@"
