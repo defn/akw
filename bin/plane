@@ -5,10 +5,8 @@ function main {
   source "$shome/script/profile"
   source "$shome/exec/inception"
 
-  set -x
-
   exec limbo "${INCEPTION_PROVIDER}" "$@"
 }
 
-export SUB_MIDDLEWARE='plane'
+export SUB_MIDDLEWARE="${BASH_SOURCE##*/}"
 source sub "$BASH_SOURCE" "$@"

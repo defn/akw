@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+export BASEBOX_INSTANCE='snow'
+export BASEBOX_IP="172.28.128.6"
+export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.6"
+export INCEPTION_PROVIDER='virtualbox'
+
+source sub-middleware "$BASH_SOURCE" "$@"
