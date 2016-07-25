@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
 
+function main {
+  local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
+  source "$shome/script/profile"
+  source "$shome/exec/inception"
+
+  set -x
+
+  exec limbo "${INCEPTION_PROVIDER}" "$@"
+}
+
 export SUB_MIDDLEWARE='plane'
 source sub "$BASH_SOURCE" "$@"
