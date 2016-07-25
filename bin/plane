@@ -8,4 +8,8 @@ function main {
   exec limbo "${INCEPTION_PROVIDER}" "$@"
 }
 
-source sub-chain "$BASH_SOURCE" "$@"
+if [[ -z "${INCEPTION_PROVIDER:-}" ]]; then
+  source sub-chain "$BASH_SOURCE" virtualbox "$@"
+else
+  source sub-chain "$BASH_SOURCE" "$@"
+fi
