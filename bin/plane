@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-unset SUB_MIDDLEWARE
-source sub-middleware "$BASH_SOURCE" "$@"
+export SUB_MIDDLEWARE='plane'
+source sub "$BASH_SOURCE" "$@"

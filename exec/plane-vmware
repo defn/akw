@@ -14,4 +14,4 @@ export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.13"
 
 export INCEPTION_PROVIDER='vmware'
 
-exec sub-middleware "$BASH_SOURCE" "$@"
+source sub-middleware "$BASH_SOURCE" "$@"
