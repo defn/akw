@@ -4,10 +4,12 @@ function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
+  set -x
+
   $INCEPTION destroy -f
   VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
   $PLANE rebase
-  $PLANE reuse vagrant
+  $PLANE reuse
 
   $PLANE recycle
   $PLANE swarm primary
@@ -17,7 +19,7 @@ function main {
   $PLANE recycle
   $PLANE swarm primary
   $PLANE docker image import
-  $PLANE reuse docker
+  $PLANE reuse
 
   $INCEPTION destroy -f
   VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
