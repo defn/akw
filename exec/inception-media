@@ -21,6 +21,8 @@ function main {
 
   $INCEPTION destroy -f
   VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
+  $PLANE recycle
+  $PLANE destroy -f
 }
 
 source sub "$BASH_SOURCE" "$@"
