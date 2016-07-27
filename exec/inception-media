@@ -14,13 +14,15 @@ function main {
   clean_slate
 
   $PLANE rebase
-  $PLANE swarm primary
+  $PLANE swarm node
+  $PLANE "$a" update
   $PLANE docker image rebase
   $PLANE docker image reuse
 
   for a in virtualbox vmware; do
     $PLANE "$a" recycle
     $PLANE "$a" swarm node
+    $PLANE "$a" update
     $PLANE "$a" docker image import
     $PLANE "$a" reuse
   done
