@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+function main {
+  local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
+  source "$shome/script/profile"
+
+  $INCEPTION destroy -f
+  VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
+}
+
+source sub "$BASH_SOURCE" "$@"

@@ -1,23 +1,20 @@
 #!/usr/bin/env bash
 
-function clean_slate {
-  $INCEPTION destroy -f
-  VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
-}
-
 function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
   set -x
 
-  clean_slate
+  $INCEPTION clean
 
   $PLANE rebase
   $PLANE swarm node
   $PLANE "$a" update
   $PLANE docker image rebase
   $PLANE docker image reuse
+
+  $INCEPTION clean
 
   for a in virtualbox vmware; do
     $PLANE "$a" recycle
@@ -27,14 +24,12 @@ function main {
     $PLANE "$a" reuse
   done
 
-  clean_slate
+  $INCEPTION clean
 
   for a in virtualbox vmware; do
     $PLANE "$a" recycle
     $PLANE "$a" destroy -f
   done
-
-  clean_slate
 }
 
 source sub "$BASH_SOURCE" "$@"
