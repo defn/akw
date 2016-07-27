@@ -4,23 +4,24 @@ function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
-  for a in $PLANE $VAN $HOTEL $SNOW; do
+  for a in $PLANE $VAN; do
+    docker machine rm -f $a1 2>&- || true
     $a update
     case "$a" in
       $PLANE)
-        runmany 1 'docker machine rm -f $1 2>&- || true; $1 recycle; $1 swarm primary' $PLANE
+        $a virtualbox recycle
+        $a virtualbox swarm primary
         $INCEPTION network create inception || true
         ;;
       
-      *)
-        docker machine rm -f $a 2>&- || true
-        $a recycle
-        $a swarm node
+      $VAN)
+        $a vmware recycle
+        $a vmware swarm node
         ;;
     esac
   done
 
-  docker machine ls
+  $INCEPTION docker machine ls
 }
 
 source sub "$BASH_SOURCE" "$@"
