@@ -5,7 +5,10 @@ function main {
   source "$shome/script/profile"
 
   $INCEPTION destroy -f
-  VBoxManage list vms | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
+
+  VBoxManage list vms 2>&- | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
+
+  vmrun list 2>&- | grep -v "Total" | runmany 'vmrun stop "$1" || true; j vmrun deleteVM "$1 || true"'
 }
 
 source sub "$BASH_SOURCE" "$@"
