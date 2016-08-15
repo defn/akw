@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source normalize
+
 export BOX_NAME='dream'
 export BASEBOX_NAME='inception'
 export BASEBOX_HOME_URL='git@github.com:defn/home'
