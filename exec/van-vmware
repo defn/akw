@@ -3,6 +3,6 @@
 export BASEBOX_INSTANCE='van'
 export BASEBOX_IP="172.28.129.4"
 export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.14"
-export INCEPTION_PROVIDER='vmware'
+export VAGRANT_DEFAULT_PROVIDER='vmware'
 
 source sub-middleware "$BASH_SOURCE" "$@"

@@ -4,8 +4,6 @@ function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
-  set -x
-
   $INCEPTION clean
 
   $PLANE rebase

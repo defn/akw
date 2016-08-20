@@ -11,3 +11,7 @@ export VAN='van'
 export HOTEL='hotel'
 export SNOW='snow'
 export INCEPTION='inception'
+
+function limbo {
+  command limbo "${VAGRANT_DEFAULT_PROVIDER}" "$@"
+}

@@ -3,12 +3,25 @@
 function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
+
   source inception_common
 
-  exec limbo "${INCEPTION_PROVIDER}" "$@"
+  if limbo "$@"; then
+    case "${1:-}" in
+      build|recycle) 
+        case "$(basename "${BASH_SOURCE}")" in
+          plane) limbo swarm primary ;;
+          *) limbo swarm node ;;
+        esac
+
+        limbo docker ps
+        limbo docker images -a
+        ;;
+    esac
+  fi
 }
 
-if [[ -z "${INCEPTION_PROVIDER:-}" ]]; then
+if [[ -z "${VAGRANT_DEFAULT_PROVIDER:-}" ]]; then
   source sub-chain "$BASH_SOURCE" virtualbox "$@"
 else
   source sub-chain "$BASH_SOURCE" "$@"
