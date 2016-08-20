@@ -3,7 +3,7 @@
 function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
-  source "$shome/exec/inception"
+  source inception_common
 
   export BASEBOX_INSTANCE='dream'
   export BASEBOX_IP="172.28.128.1"
