@@ -1,5 +1,6 @@
 {
   "require": [
-    "limbo"
+    "limbo",
+    "limbo-swarm"
   ]
 }
