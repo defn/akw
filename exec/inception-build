@@ -3,25 +3,20 @@
 function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
+  source inception_common
 
-  for a in $PLANE $VAN; do
-    docker machine rm -f $a1 2>&- || true
-    $a update
-    case "$a" in
-      $PLANE)
-        $a virtualbox recycle
-        $a virtualbox swarm primary
-        $INCEPTION network create inception || true
-        ;;
-      
-      $VAN)
-        $a vmware recycle
-        $a vmware swarm node
-        ;;
-    esac
-  done
+  $INCEPTION clean
 
-  $INCEPTION docker machine ls
+  if [[ "$#" == 0 ]]; then
+    set -- virtualbox vmware parallels
+  fi
+
+  runmany 'plane $1 recycle' "$@"
+  runmany 'plane $1 docker image import; plane $1 reuse' "$@"
+
+  $INCEPTION clean
+
+  runmany 'plane $1 recycle; plane $1 destroy -f' "$@"
 }
 
 source sub "$BASH_SOURCE" "$@"

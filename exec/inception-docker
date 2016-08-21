@@ -7,12 +7,14 @@ function main {
 
   $INCEPTION clean
 
-  if [[ "$#" == 0 ]]; then
-    set -- virtualbox vmware parallels
-  fi
+  case "$#" in
+		0) set -- plane virtualbox ;;
+		1) set - "$@" virtualbox ;;
+	esac
 
-  runmany 'plane $1 rebase' "$@"
-  runmany 'plane $1 reuse vagrant' "$@"
+  "$1" "$2" recycle
+  "$1" "$2" docker image rebase
+  "$1" "$2" docker image reuse
 }
 
 source sub "$BASH_SOURCE" "$@"
