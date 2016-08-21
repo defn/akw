@@ -9,32 +9,23 @@ function main {
 
   $INCEPTION clean
 
-  $PLANE virtualbox rebase
-  
-  $PLANE virtualbox docker image rebase
-  $PLANE virtualbox docker image reuse
+  runmany 'plane $1 rebase' virtualbox vmware parallels
+  runmany 'plane $1 reuse vagrant' virtualbox vmware parallels
 
   $INCEPTION clean
 
-  for a in virtualbox vmware parallels; do
-    $PLANE "$a" rebase
-    $PLANE "$a" reuse vagrant
-  done
+  plane virtualbox recycle
+  plane virtualbox docker image rebase
+  plane virtualbox docker image reuse
 
   $INCEPTION clean
 
-  for a in virtualbox vmware parallels; do
-    $PLANE "$a" recycle
-    $PLANE "$a" docker image import
-    $PLANE "$a" reuse
-  done
+  runmany 'plane $1 recycle' virtualbox vmware parallels
+  runmany 'plane $1 docker image import; plane $1 reuse' virtualbox vmware parallels
 
   $INCEPTION clean
 
-  for a in virtualbox vmware parallels; do
-    $PLANE "$a" recycle
-    $PLANE "$a" destroy -f
-  done
+  runmany 'plane $1 recycle; plane $1 destroy -f' virtualbox vmware parallels
 }
 
 source sub "$BASH_SOURCE" "$@"
