@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-export BASEBOX_INSTANCE=$SNOW
-export BASEBOX_IP="172.28.129.6"
-export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.16"
-export VAGRANT_DEFAULT_PROVIDER='vmware'
-
-source sub-middleware "$BASH_SOURCE" "$@"

@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-export BASEBOX_INSTANCE='van'
-export BASEBOX_IP="172.28.129.4"
-export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.14"
-export VAGRANT_DEFAULT_PROVIDER='vmware'
-
-source sub-middleware "$BASH_SOURCE" "$@"

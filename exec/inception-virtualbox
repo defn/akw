@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+export BASEBOX_INSTANCE="${INCEPTION_DREAM}"
+export VAGRANT_DEFAULT_PROVIDER='virtualbox'
+
+__inception_net=3
+case "${INCEPTION_DREAM}" in
+  plane) __inception_net=0 ;;
+  van)   __inception_net=1 ;;
+  hotel) __inception_net=2 ;;
+  show)  __inception_net=3 ;;
+esac
+
+export BASEBOX_IP="172.28.128.${__inception_net}"
+export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.${__inception_net}"
+
+source sub-middleware "$BASH_SOURCE" "$@"
