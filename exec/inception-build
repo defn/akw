@@ -15,8 +15,6 @@ function main {
   runmany 'plane $1 docker image import; plane $1 reuse' "$@"
 
   $INCEPTION clean
-
-  runmany 'plane $1 recycle; plane $1 destroy -f' "$@"
 }
 
 source sub "$BASH_SOURCE" "$@"
