@@ -3,13 +3,24 @@
 function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
+
   source inception_common
 
-  export BASEBOX_INSTANCE='dream'
-  export BASEBOX_IP="172.28.128.1"
-  export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.2"
+  local nm_tier="${BASH_SOURCE##*/}"
 
-  exec limbo "$@"
+  if limbo "$@"; then
+    case "${1:-}" in
+      build|recycle) 
+        case "${INCEPTION_DREAM}/${VAGRANT_DEFAULT_PROVIDER}" in
+          plane/virtualbox) limbo swarm primary ;;
+          *) limbo swarm node ;;
+        esac
+
+        limbo docker ps
+        limbo docker images -a
+        ;;
+    esac
+  fi
 }
 
-source sub "$BASH_SOURCE" "$@"
+source sub-chain dream "$@"
