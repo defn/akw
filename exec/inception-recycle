@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+function main {
+  local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
+  source "$shome/script/profile"
+  source inception_common
+
+  runmany 'docker machine rm -f $1 2>&- ||  true' plane van hotel snow
+
+  plane virtualbox recycle
+  van virtualbox recycle
+  hotel vmware recycle
+  #snow parallels recycle
+  inception info
+}
+
+source sub "$BASH_SOURCE" "$@"
