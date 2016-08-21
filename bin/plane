@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
 export INCEPTION_DREAM="${BASH_SOURCE##*/}"
+export BASEBOX_INSTANCE="${INCEPTION_DREAM}"
 
 source sub-chain dream "$@"

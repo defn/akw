@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-export BASEBOX_INSTANCE="${INCEPTION_DREAM}"
 export VAGRANT_DEFAULT_PROVIDER='vmware'
 
 __inception_net=3
