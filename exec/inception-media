@@ -8,18 +8,16 @@ function main {
   $INCEPTION clean
 
   $PLANE rebase
-  $PLANE reuse vagrant
 
   $PLANE update
-  $PLANE swarm primary
-
   $PLANE docker image rebase
   $PLANE docker image reuse
 
   $INCEPTION clean
 
-  for a in virtualbox; do
-    $PLANE "$a" recycle
+  for a in virtualbox vmware parallels; do
+    $PLANE "$a" rebase
+    $PLANE "$a" reuse vagrant
 
     $PLANE "$a" update
     $PLANE "$a" docker image import
@@ -29,7 +27,7 @@ function main {
 
   $INCEPTION clean
 
-  for a in virtualbox; do
+  for a in virtualbox vmware parallels; do
     $PLANE "$a" recycle
     $PLANE "$a" destroy -f
   done
