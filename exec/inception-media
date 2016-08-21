@@ -3,13 +3,16 @@
 function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
+  source inception_common
 
   $INCEPTION clean
 
   $PLANE rebase
   $PLANE reuse vagrant
+
   $PLANE update
   $PLANE swarm primary
+
   $PLANE docker image rebase
   $PLANE docker image reuse
 
@@ -17,8 +20,10 @@ function main {
 
   for a in virtualbox; do
     $PLANE "$a" recycle
+
     $PLANE "$a" update
     $PLANE "$a" docker image import
+
     $PLANE "$a" reuse
   done
 
