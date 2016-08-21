@@ -10,13 +10,13 @@ function main {
 
   if limbo "$@"; then
     case "${1:-}" in
-      build|recycle) 
+      build|recycle|rebase) 
         limbo update
         case "${INCEPTION_DREAM}/${VAGRANT_DEFAULT_PROVIDER}" in
           plane/virtualbox) limbo swarm primary ;;
           *) limbo swarm node ;;
         esac
-
+        limbo update
         limbo docker ps
         limbo docker images -a
         ;;
