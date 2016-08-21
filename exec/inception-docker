@@ -1,20 +1,3 @@
 #!/usr/bin/env bash
 
-function main {
-  local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
-  source "$shome/script/profile"
-  source inception_common
-
-  $INCEPTION clean
-
-  case "$#" in
-		0) set -- plane virtualbox ;;
-		1) set - "$@" virtualbox ;;
-	esac
-
-  "$1" "$2" recycle
-  "$1" "$2" docker image rebase
-  "$1" "$2" docker image reuse
-}
-
 source sub "$BASH_SOURCE" "$@"
