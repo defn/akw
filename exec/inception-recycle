@@ -7,11 +7,9 @@ function main {
 
   runmany 'docker machine rm -f $1 2>&- ||  true' plane van hotel snow
 
-  plane virtualbox recycle
   van virtualbox recycle
   hotel vmware recycle
-  #snow parallels recycle
-  inception info
+  snow parallels recycle
 }
 
 source sub "$BASH_SOURCE" "$@"
