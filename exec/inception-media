@@ -11,8 +11,7 @@ function main {
     set -- virtualbox vmware parallels
   fi
 
-  runmany 'plane $1 rebase' "$@"
-  runmany 'plane $1 reuse vagrant' "$@"
+  runmany 'plane $1 rebase; plane $1 reuse vagrant' "$@"
 }
 
 source sub "$BASH_SOURCE" "$@"
