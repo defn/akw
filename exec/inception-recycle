@@ -7,6 +7,7 @@ function main {
 
   runmany 'docker machine rm -f $1 2>&- ||  true' plane van hotel snow
 
+  export LIMBO_LINKED_CLONES=1
   van virtualbox recycle
   hotel vmware recycle
   snow parallels recycle
