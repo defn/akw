@@ -4,10 +4,7 @@ function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
-  inception clean vagrant
-  inception clean virtualbox
-  inception clean vmware
-  inception clean parallels
+  prlctl list -a | tail +2 | awk '{print $NF}' | runmany 'prlctl stop $1 || true; prlctl delete $1 || true'
 }
 
 source sub "$BASH_SOURCE" "$@"
