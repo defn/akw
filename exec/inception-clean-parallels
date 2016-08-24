@@ -5,6 +5,7 @@ function main {
   source "$shome/script/profile"
 
   prlctl list -a | tail +2 | awk '{print $NF}' | runmany 'prlctl stop $1 || true; prlctl delete $1 || true'
+  (set +f; rm -rf ~/Documents/Parallels)
 }
 
 source sub "$BASH_SOURCE" "$@"
