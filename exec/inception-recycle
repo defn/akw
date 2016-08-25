@@ -14,7 +14,7 @@ function main {
   export LIMBO_LINKED_CLONES=1
 
   for a in "$@"; do
-    case "$@" in
+    case "$a" in
       virtualbox) van virtualbox recycle ;;
       vmware) hotel vmware recycle ;;
       parallels) snow parallels recycle ;;
