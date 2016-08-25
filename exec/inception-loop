@@ -9,7 +9,7 @@ function main {
     set -- van hotel snow
   fi
 
-  seq 1 2 | while read a; do 
+  seq 1 100000 | while read a; do 
     for b in "$@"; do 
       printf '%s %s %q ' "$a" "$b" "uname -a"
     done
