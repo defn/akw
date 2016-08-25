@@ -13,5 +13,9 @@ export SNOW='snow'
 export INCEPTION='inception'
 
 function limbo {
-  command limbo "${VAGRANT_DEFAULT_PROVIDER}" "$@"
+  if [[ -n "${VAGRANT_DEFAULT_PROVIDER:-}" ]]; then
+    set -- "${VAGRANT_DEFAULT_PROVIDER}" "$@"
+  fi
+
+  command limbo "$@"
 }

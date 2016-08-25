@@ -5,8 +5,6 @@ function main {
   source "$shome/script/profile"
   source inception_common
 
-  local nm_tier="${BASH_SOURCE##*/}"
-
   if limbo "$@"; then
     case "${1:-}" in
       build|recycle|rebase) 
