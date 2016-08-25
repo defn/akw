@@ -5,19 +5,28 @@ function main {
   source "$shome/script/profile"
   source inception_common
 
-  runmany 'docker machine rm -f $1 2>&- ||  true' plane van hotel snow
-
   if [[ "$#" == 0 ]]; then
-    set -- virtualbox vmware parallels
+    set -- van hotel snow
   fi
 
   export LIMBO_LINKED_CLONES=1
 
   for a in "$@"; do
     case "$a" in
-      virtualbox) van virtualbox recycle ;;
-      vmware) hotel vmware recycle ;;
-      parallels) snow parallels recycle ;;
+      virtualbox|van) 
+        van virtualbox recycle
+        docker machine rm -f van  2>&- ||  true
+        ;;
+
+      vmware|hotel) 
+        hotel vmware recycle
+        docker machine rm -f hotel 2>&- ||  true
+        ;;
+
+      parallels|snow) 
+        snow parallels recycle
+        docker machine rm -f snow 2>&- ||  true
+        ;;
     esac
   done
 }
