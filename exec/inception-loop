@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+function main {
+  local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
+  source "$shome/script/profile"
+  source inception_common
+
+  if [[ "$#" == 0 ]]; then
+    set -- van hotel snow
+  fi
+
+  seq 1 2 | while read a; do 
+    for b in "$@"; do 
+      printf '%s %s %q ' "$a" "$b" "uname -a"
+    done
+  done | runmany $(( $# * 3 )) 3 'printf "%5d %10s %s\\n" "$1" "$2" "$($2 run inception:vagrant $3)"'
+}
+
+source sub "$BASH_SOURCE" "$@"
