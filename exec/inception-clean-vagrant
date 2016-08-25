@@ -5,6 +5,7 @@ function main {
   source "$shome/script/profile"
 
   $INCEPTION destroy -f
+  rm -rf ~/.vagrant.d/tmp
 }
 
 source sub "$BASH_SOURCE" "$@"
