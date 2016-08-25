@@ -14,18 +14,18 @@ function main {
   for a in "$@"; do
     case "$a" in
       virtualbox|van) 
-        van virtualbox recycle
         docker machine rm -f van  2>&- ||  true
+        van virtualbox recycle
         ;;
 
       vmware|hotel) 
-        hotel vmware recycle
         docker machine rm -f hotel 2>&- ||  true
+        hotel vmware recycle
         ;;
 
       parallels|snow) 
-        snow parallels recycle
         docker machine rm -f snow 2>&- ||  true
+        snow parallels recycle
         ;;
     esac
   done
