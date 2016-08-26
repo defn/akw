@@ -6,6 +6,7 @@ function main {
 
   $INCEPTION destroy -f
   rm -rf ~/.vagrant.d/tmp
+  rm -rf ${CACHE_DIR}/output
 }
 
 source sub "$BASH_SOURCE" "$@"
