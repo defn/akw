@@ -6,7 +6,9 @@ function main {
 
   inception clean
   inception media
+  inception clean
   inception build
+  inception clean
   inception recycle
 }
 

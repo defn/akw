@@ -5,8 +5,6 @@ function main {
   source "$shome/script/profile"
   source inception_common
 
-  $INCEPTION clean
-
   case "$#" in
 		0) set -- plane virtualbox ;;
 		1) set - "$@" virtualbox ;;

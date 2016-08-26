@@ -5,16 +5,12 @@ function main {
   source "$shome/script/profile"
   source inception_common
 
-  $INCEPTION clean
-
   if [[ "$#" == 0 ]]; then
     set -- virtualbox vmware parallels
   fi
 
   runmany 'plane $1 recycle' "$@"
   runmany 'plane $1 docker image import; plane $1 reuse' "$@"
-
-  $INCEPTION clean
 }
 
 source sub "$BASH_SOURCE" "$@"

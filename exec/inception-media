@@ -5,8 +5,6 @@ function main {
   source "$shome/script/profile"
   source inception_common
 
-  $INCEPTION clean
-
   if [[ "$#" == 0 ]]; then
     set -- virtualbox vmware parallels
   fi
