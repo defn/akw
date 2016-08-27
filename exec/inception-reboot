@@ -4,12 +4,9 @@ function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
-  inception clean
-  inception media
-  inception clean
-  inception build
-  inception clean
-  inception recycle
+  inception media "$@"
+  inception build "$@"
+  inception recycle "$@"
 }
 
 source sub "$BASH_SOURCE" "$@"
