@@ -11,6 +11,7 @@ case "${INCEPTION_DREAM}" in
 esac
 
 export BASEBOX_IP="172.28.129.${__inception_net}"
-export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.2${__inception_net}"
+export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.3${__inception_net}"
+export BASEBOX_LXD_NETWORK_PREFIX="172.29.4${__inception_net}"
 
 source sub-middleware "$BASH_SOURCE" "$@"
