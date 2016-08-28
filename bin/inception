@@ -7,7 +7,7 @@ function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
-  eval $($PLANE virtualbox docker machine env --swarm --no-proxy $PLANE)
+  eval $(plane docker machine env --swarm --no-proxy plane)
   exec docker "$@"
 }
 

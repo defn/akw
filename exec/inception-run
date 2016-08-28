@@ -4,7 +4,7 @@ function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
-  exec $PLANE virtualbox swarm run "$@"
+  exec plane run inception:vagrant "$@"
 }
 
 source sub "$BASH_SOURCE" "$@"

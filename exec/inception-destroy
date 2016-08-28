@@ -3,9 +3,30 @@
 function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
+  source inception_common
 
-  sudo true
-  runmany 10 'docker machine rm -f $1 2>&- ||  true; $1 destroy -f 2>&- || true' $PLANE $VAN $HOTEL $SNOW
+  if [[ "$#" == 0 ]]; then
+    set -- virtualbox vmware parallels
+  fi
+
+  for a in "$@"; do
+    case "$a" in
+      virtualbox|van)
+        a=virtualbox
+        b=van
+        ;;
+      vmware|hotel)
+        a=vmware
+        b=hotel
+        ;;
+      parallels|snow) 
+        a=parallels
+        b=snow
+        ;;
+    esac
+    docker machine rm -f "$b" 2>&- ||  true
+    $b $a destroy -f 2>&- || true
+  done
 }
 
 source sub "$BASH_SOURCE" "$@"

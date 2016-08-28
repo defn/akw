@@ -6,12 +6,6 @@ export BOX_NAME='dream'
 export BASEBOX_NAME='inception'
 export BASEBOX_HOME_URL='git@github.com:defn/home'
 
-export PLANE='plane'
-export VAN='van'
-export HOTEL='hotel'
-export SNOW='snow'
-export INCEPTION='inception'
-
 function limbo {
   if [[ -n "${VAGRANT_DEFAULT_PROVIDER:-}" ]]; then
     set -- "${VAGRANT_DEFAULT_PROVIDER}" "$@"
