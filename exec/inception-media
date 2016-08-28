@@ -9,7 +9,24 @@ function main {
     set -- virtualbox vmware parallels
   fi
 
-  runmany 'plane $1 rebase; plane $1 reuse vagrant' "$@"
+  for a in "$@"; do
+    case "$a" in
+      virtualbox|van)
+        a=virtualbox
+        b=van
+        ;;
+      vmware|hotel)
+        a=vmware
+        b=hotel
+        ;;
+      parallels|snow) 
+        a=parallels
+        b=snow
+        ;;
+    esac
+    $b $a rebase
+    $b $a reuse vagrant
+  done
 }
 
 source sub "$BASH_SOURCE" "$@"

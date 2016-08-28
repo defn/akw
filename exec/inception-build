@@ -9,8 +9,27 @@ function main {
     set -- virtualbox vmware parallels
   fi
 
-  runmany 'plane $1 recycle' "$@"
-  runmany 'plane $1 docker image import; plane $1 reuse' "$@"
+  for a in "$@"; do
+    case "$a" in
+      virtualbox|van)
+        a=virtualbox
+        b=van
+        ;;
+      vmware|hotel)
+        a=vmware
+        b=hotel
+        ;;
+      parallels|snow) 
+        a=parallels
+        b=snow
+        ;;
+    esac
+    $b $a recycle
+    $b docker init
+    $b docker image import
+    $b lxc init
+    $b $a reuse
+  done
 }
 
 source sub "$BASH_SOURCE" "$@"

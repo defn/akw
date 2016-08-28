@@ -6,7 +6,7 @@ function main {
   source inception_common
 
   if [[ "$#" == 0 ]]; then
-    set -- van hotel snow
+    set -- virtualbox vmware parallels
   fi
 
   export LIMBO_LINKED_CLONES=1
@@ -14,20 +14,22 @@ function main {
   for a in "$@"; do
     case "$a" in
       virtualbox|van) 
-        docker machine rm -f van  2>&- ||  true
-        van virtualbox recycle
+        a=virtualbox
+        b=van
         ;;
-
       vmware|hotel) 
-        docker machine rm -f hotel 2>&- ||  true
-        hotel vmware recycle
+        a=vmware
+        b=hotel
         ;;
-
       parallels|snow) 
-        docker machine rm -f snow 2>&- ||  true
-        snow parallels recycle
+        a=parallels
+        b=snow
         ;;
     esac
+    docker machine rm -f $b 2>&- ||  true
+    $b $a recycle
+    $b docker init
+    $b lxc init
   done
 }
 
