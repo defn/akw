@@ -25,9 +25,9 @@ function main {
         ;;
     esac
     $b $a recycle
-    $b docker init
-    $b docker image import
-    $b lxc init
+    $b $a swarm node
+    $b $a docker image import
+    $b $a lxc init
     $b $a reuse
   done
 }

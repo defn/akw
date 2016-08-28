@@ -26,10 +26,9 @@ function main {
         b=snow
         ;;
     esac
-    docker machine rm -f $b 2>&- ||  true
     $b $a recycle
-    $b docker init
-    $b lxc init
+    $b $a docker init
+    $b $a lxc init
   done
 }
 
