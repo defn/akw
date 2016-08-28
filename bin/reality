@@ -9,10 +9,12 @@ function main {
     case "${1:-}" in
       build|recycle|rebase) 
         limbo update
-        limbo swarm node
-        limbo update
+        limbo docker init
+        limbo lxc init
         limbo docker ps
         limbo docker images -a
+        limbo lxc list
+        limbo lxc image list
         ;;
     esac
   fi
