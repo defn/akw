@@ -2,12 +2,11 @@
 
 export VAGRANT_DEFAULT_PROVIDER='vmware'
 
-__inception_net=3
 case "${INCEPTION_DREAM}" in
   plane) __inception_net=2 ;;
   van)   __inception_net=3 ;;
   hotel) __inception_net=4 ;;
-  show)  __inception_net=5 ;;
+  snow)  __inception_net=5 ;;
 esac
 
 export BASEBOX_IP="172.28.129.${__inception_net}"
