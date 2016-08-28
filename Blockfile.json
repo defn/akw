@@ -1,6 +1,7 @@
 {
   "require": [
     "limbo",
-    "limbo-swarm"
+    "limbo-swarm",
+    "limbo-lxd"
   ]
 }
