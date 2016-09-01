@@ -1,5 +1,6 @@
 {
   "require": [
+    "docker",
     "limbo",
     "limbo-lxd"
   ]
