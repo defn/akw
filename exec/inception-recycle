@@ -27,7 +27,6 @@ function main {
         ;;
     esac
     $b $a recycle
-    $b $a docker init
     $b $a lxc init
   done
 }
