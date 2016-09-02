@@ -27,6 +27,7 @@ function main {
     $b $a recycle
     $b $a lxd init
     $b $a docker init
+    $b $a docker image import
     $b $a reuse
   done
 }
