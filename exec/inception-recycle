@@ -27,7 +27,7 @@ function main {
         ;;
     esac
     $b $a recycle
-    $b $a lxc init
+    $b $a lxd init
   done
 }
 
