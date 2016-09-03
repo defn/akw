@@ -8,7 +8,10 @@ export BASEBOX_HOME_URL='git@github.com:defn/home'
 
 function limbo {
   if [[ -n "${VAGRANT_DEFAULT_PROVIDER:-}" ]]; then
-    set -- "${VAGRANT_DEFAULT_PROVIDER}" "$@"
+    case "${VAGRANT_DEFAULT_PROVIDER}" in
+      vmware*) set -- vmware "$@" ;;
+      *) set -- "${VAGRANT_DEFAULT_PROVIDER}" "$@" ;;
+    esac
   fi
 
   command limbo "$@"
