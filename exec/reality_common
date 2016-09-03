@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+case "${INCEPTION_DREAM}" in
+  plane) __inception_net=2 ;;
+  van)   __inception_net=3 ;;
+  hotel) __inception_net=4 ;;
+  snow)  __inception_net=5 ;;
+esac
+
+export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.${__inception_net}0"
+export BASEBOX_LXD_NETWORK_PREFIX="172.29.${__inception_net}1"
