@@ -28,6 +28,7 @@ function main {
     esac
     $b $a recycle
     $b $a lxd init
+    $b $a docker init
   done
 }
 
