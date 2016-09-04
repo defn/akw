@@ -5,13 +5,7 @@ function main {
   source "$shome/script/profile"
   source inception_common
 
-  if limbo "$@"; then
-    case "${1:-}" in
-      build|recycle|rebase) 
-        limbo update
-        ;;
-    esac
-  fi
+  exec limbo "$@"
 }
 
 source sub-chain reality "$@"
