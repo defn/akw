@@ -13,7 +13,7 @@ function main {
     for b in "$@"; do 
       printf '%s %s %q ' "$(( a * 3 ))" "$b" "uname -a"
     done
-  done | runmany $(( $# * 3 )) 3 'printf "%5d %10s %s\\n" "$1" "$2" "$($2 docker run inception:vagrant $3)"'
+  done | runmany $(( $# * 3 )) 3 'printf "%5d %10s %s\\n" "$1" "$2" "$($2 docker run --rm inception:vagrant $3)"'
 }
 
 source sub "$BASH_SOURCE" "$@"
