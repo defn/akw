@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-eval $(docker machine env --no-proxy $INCEPTION_DREAM 2>&-)
+eval $(docker machine env --no-proxy $INCEPTION_DREAM)
 
 function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
