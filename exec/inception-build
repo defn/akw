@@ -28,7 +28,8 @@ function main {
     $b $a lxd init
     $b $a update
     $b $a docker init
-    $b $a docker image import
+    $b docker pull $CACHE_VIP:5000/inception:vagrant
+    $b docker tag $CACHE_VIP:5000/inception:vagrant inception:vagrant
     $b $a reuse
   done
 }
