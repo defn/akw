@@ -11,6 +11,10 @@ function main {
 
   for a in "$@"; do
     case "$a" in
+      plane)
+        a=virtualbox
+        b=plane
+        ;;
       virtualbox|van)
         a=virtualbox
         b=van

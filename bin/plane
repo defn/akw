@@ -15,6 +15,10 @@ if [[ -n "${VAGRANT_DEFAULT_PROVIDER:-}" ]]; then
   source sub-chain reality "$@"
 else
   case "$BASH_SOURCE" in
+    *plane)
+      a=virtualbox
+      b=plane
+      ;;
     *van)
       a=virtualbox
       b=van
