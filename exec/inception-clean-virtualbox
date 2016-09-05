@@ -4,7 +4,7 @@ function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
-  VBoxManage list vms 2>&- | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
+  VBoxManage list vms 2>/dev/null | cut -d'"' -f2 | runmany 'VBoxManage controlvm $1 poweroff || true; VBoxManage unregistervm --delete $1 || true'
 }
 
 source sub "$BASH_SOURCE" "$@"

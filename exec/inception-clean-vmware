@@ -4,7 +4,7 @@ function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
-  vmrun list 2>&- | grep -v "Total" | runmany 'vmrun stop "$1" || true; vmrun deleteVM "$1" || true'
+  vmrun list 2>/dev/null | grep -v "Total" | runmany 'vmrun stop "$1" || true; vmrun deleteVM "$1" || true'
 }
 
 source sub "$BASH_SOURCE" "$@"
