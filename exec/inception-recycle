@@ -16,13 +16,13 @@ function main {
       set -- "$@" virtualbox
     fi
 
-    b="$1"; shift
     a="$1"; shift
+    b="$1"; shift
 
-    $b $a recycle
-    $b $a lxd init
-    $b $a update
-    $b $a docker init
+    $a $b recycle
+    $a $b lxd init
+    $a $b update
+    $a $b docker init
   done
 }
 
