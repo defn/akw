@@ -21,8 +21,8 @@ function main {
 
     $a $b recycle
     $a $b lxd init
-    $a $b update
     $a $b docker init
+    $a $b update
   done
 }
 
