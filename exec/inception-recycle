@@ -6,7 +6,7 @@ function main {
   source inception_common
 
   if [[ "$#" == 0 ]]; then
-    set -- van virtualbox
+    set -- van virtualbox hotel virtualbox snow virtualbox
   fi
 
   export LIMBO_LINKED_CLONES=1
