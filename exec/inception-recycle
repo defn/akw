@@ -6,26 +6,19 @@ function main {
   source inception_common
 
   if [[ "$#" == 0 ]]; then
-    set -- virtualbox vmware parallels
+    set -- van virtualbox
+  fi
+
+  if [[ "$#" == 1 ]]; then
+    set -- "$@" virtualbox
   fi
 
   export LIMBO_LINKED_CLONES=1
 
-  for a in "$@"; do
-    case "$a" in
-      virtualbox|van) 
-        a=virtualbox
-        b=van
-        ;;
-      vmware|hotel) 
-        a=vmware
-        b=hotel
-        ;;
-      parallels|snow) 
-        a=parallels
-        b=snow
-        ;;
-    esac
+  while [[ "$#" != 0 ]]; do
+    a="$1"; shift
+    b="$1"; shift
+
     $b $a recycle
     $b $a lxd init
     $b $a update
