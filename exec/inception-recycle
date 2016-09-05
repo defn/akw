@@ -9,15 +9,15 @@ function main {
     set -- van virtualbox
   fi
 
-  if [[ "$#" == 1 ]]; then
-    set -- "$@" virtualbox
-  fi
-
   export LIMBO_LINKED_CLONES=1
 
   while [[ "$#" != 0 ]]; do
-    a="$1"; shift
+    if [[ "$#" == 1 ]]; then
+      set -- "$@" virtualbox
+    fi
+
     b="$1"; shift
+    a="$1"; shift
 
     $b $a recycle
     $b $a lxd init
