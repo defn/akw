@@ -2,7 +2,7 @@
 
 source reality_common
 
-export VAGRANT_DEFAULT_PROVIDER='vmware'
+export VAGRANT_DEFAULT_PROVIDER='vmware_fusion'
 export BASEBOX_IP="172.28.129.${__inception_net}"
 
 source sub-middleware "$BASH_SOURCE" "$@"
