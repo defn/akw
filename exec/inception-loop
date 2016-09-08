@@ -5,15 +5,15 @@ function main {
   source "$shome/script/profile"
   source inception_common
 
-  if [[ "$#" == 0 ]]; then
-    set -- van hotel snow
-  fi
+  local nm_machine="$1"; shift
+  eval $(docker machine env --no-proxy $nm_machine)
+  
+  local cnt_to="$1"; shift
+  local cnt_many="$1"; shift
 
-  seq 1 100000 | while read a; do 
-    for b in "$@"; do 
-      printf '%s %s %q ' "$(( a * 3 ))" "$b" "uname -a"
-    done
-  done | runmany $(( $# * 3 )) 3 'printf "%5d %10s %s\\n" "$1" "$2" "$($2 docker run --rm inception:vagrant $3)"'
+  seq 1 "$cnt_to" | while read a; do 
+    printf '%s %s %q \n' "$a" "$nm_machine" "$*"
+  done | runmany "$cnt_many" 3 'printf "%5d %10s %s\\n" "$1" "$2" "$(docker run --rm inception:vagrant $3)"'
 }
 
 source sub "$BASH_SOURCE" "$@"
