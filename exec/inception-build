@@ -33,8 +33,6 @@ function main {
     $b $a docker init
     $b docker pull $CACHE_VIP:5000/inception:vagrant
     $b docker tag $CACHE_VIP:5000/inception:vagrant inception:vagrant
-    $b lxc exec docker sync
-    $b lxc snapshot docker docker0
     $b $a reuse
   done
 }
