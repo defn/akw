@@ -7,6 +7,6 @@ case "${INCEPTION_DREAM}" in
   snow)  __inception_net=5 ;;
 esac
 
-export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.${__inception_net}0"
-export BASEBOX_LXD_NETWORK_PREFIX="172.29.${__inception_net}1"
-export BASEBOX_NESTED_NETWORK_PREFIX="172.29.${__inception_net}2"
+export BASEBOX_LXD_NETWORK_PREFIX="172.29.${__inception_net}0"
+export BASEBOX_NESTED_NETWORK_PREFIX="172.29.${__inception_net}1"
+export BASEBOX_DOCKER_NETWORK_PREFIX="172.29.${__inception_net}9"
