@@ -16,12 +16,14 @@ function main {
       set -- "$@" virtualbox
     fi
 
-    a="$1"; shift
     b="$1"; shift
+    a="$1"; shift
 
-    $a $b recycle
-    $a $b lxd init
-    $a $b docker init
+    export INCEPTION_DREAM="$b"
+    source "reality_common"
+    $b $a recycle
+    $b $a lxd init "${BASEBOX_NETWORK_PREFIX}"0
+    $b $a docker init inception "${BASEBOX_NETWORK_PREFIX}1" $b "${BASEBOX_NETWORK_PREFIX}9"
   done
 }
 
