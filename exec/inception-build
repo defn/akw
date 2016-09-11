@@ -30,7 +30,7 @@ function main {
     esac
     $b $a recycle
     $b $a lxd init
-    $b $a docker init
+    $b $a docker init inception "$BASEBOX_DOCKER_NETWORK_PREFIX" "$BASEBOX_NESTED_NETWORK_PREFIX"
     $b docker pull $CACHE_VIP:5000/inception:vagrant
     $b docker tag $CACHE_VIP:5000/inception:vagrant inception:vagrant
     $b $a reuse
