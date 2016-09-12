@@ -4,11 +4,9 @@ function main {
   local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
   source "$shome/script/profile"
 
-  inception clean virtualbox
-  inception clean vmware
-  inception clean parallels
-  inception clean vagrant
-  inception clean docker
+  if [[ -d "$$MACHINE_STORAGE_PATH" ]]; then
+    rm -rf "$MACHINE_STORAGE_PATH"
+  fi
 }
 
 source sub "$BASH_SOURCE" "$@"
