@@ -1,9 +1,9 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash 
 
-function main {
-  local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
-  source "$shome/script/profile"
-  source inception_common
+function main { 
+  local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}" 
+  source "$shome/script/profile" 
+  source inception_common 
 
   if [[ "$#" == 0 ]]; then
     set -- van virtualbox hotel virtualbox snow virtualbox
@@ -24,6 +24,13 @@ function main {
     $b $a recycle
     $b $a lxd init "${BASEBOX_NETWORK_PREFIX}"0
     $b $a docker init inception "${BASEBOX_NETWORK_PREFIX}1" $b "${BASEBOX_NETWORK_PREFIX}9"
+
+    case "$b" in
+      van) dreamer=yusuf ;;
+      hotel) dreamer=arthur ;;
+      snow) dreamer=eames ;;
+    esac
+    $b $a docker init "$dreamer" "${BASEBOX_NETWORK_PREFIX}2" "$dreamer" "${BASEBOX_NETWORK_PREFIX}3" inception/inception0 system/inception0
   done
 }
 
