@@ -30,7 +30,7 @@ function main {
       hotel) dreamer=arthur ;;
       snow) dreamer=eames ;;
     esac
-    $b $a docker init "$dreamer" "${BASEBOX_NETWORK_PREFIX}2" "$dreamer" "${BASEBOX_NETWORK_PREFIX}3" inception/inception0 system/inception0
+    $b $a docker init "$dreamer" "${BASEBOX_NETWORK_PREFIX}2" "$dreamer" "${BASEBOX_NETWORK_PREFIX}3" inception/inception0
   done
 }
 

@@ -36,7 +36,7 @@ function main {
     $b docker pull $CACHE_VIP:5000/inception:vagrant
     $b docker tag $CACHE_VIP:5000/inception:vagrant inception:vagrant
     $b lxc stop inception
-    $b vagrant ssh -- sudo lvcreate -s -n inception0 system/inception
+    $b vagrant ssh -- sudo lvcreate -s -n inception0 inception/inception
     $b lxc snapshot inception inception0
     $b $a reuse
   done
