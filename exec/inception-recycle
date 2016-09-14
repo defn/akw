@@ -26,6 +26,7 @@ function main {
     $b $a docker init inception "${BASEBOX_NETWORK_PREFIX}1" $b "${BASEBOX_NETWORK_PREFIX}9"
 
     case "$b" in
+      plane) dreamer=fischer ;;
       van) dreamer=yusuf ;;
       hotel) dreamer=arthur ;;
       snow) dreamer=eames ;;
