@@ -31,7 +31,7 @@ function main {
       snow) dreamer=eames ;;
     esac
     $b $a docker init "$dreamer" "${BASEBOX_NETWORK_PREFIX}2" "$dreamer" "${BASEBOX_NETWORK_PREFIX}3" inception/inception0
-    sleep 5
+    sleep 10
 
 		$b lxc list --format json \
       | jq -r '.[] | .state.network.eth0.addresses[] | select(.scope == "global") | .address' \
