@@ -29,7 +29,6 @@ function main {
         ;;
     esac
     $b $a rebase
-    $b $a reuse vagrant
   done
 }
 

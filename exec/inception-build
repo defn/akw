@@ -38,7 +38,7 @@ function main {
     $b lxc stop inception
     $b vagrant ssh -- sudo lvcreate -s -n inception0 inception/inception
     $b lxc snapshot inception inception0
-    $b $a reuse
+    $b $a reuse vagrant
   done
 }
 
