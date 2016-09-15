@@ -30,11 +30,14 @@ function main {
     esac
     export INCEPTION_DREAM="$b"
     source "reality_common"
+    set -x
     $b $a recycle
     $b $a lxd init "${BASEBOX_NETWORK_PREFIX}"0
     $b $a docker init inception "${BASEBOX_NETWORK_PREFIX}1" $b "${BASEBOX_NETWORK_PREFIX}9"
-    $b docker pull $CACHE_VIP:5000/inception:vagrant
-    $b docker tag $CACHE_VIP:5000/inception:vagrant inception:vagrant
+    $b docker pull ubuntu:trusty
+    $b docker pull ubuntu:xenial
+    $b lxc exec inception -- lxc image copy ubuntu:14.04 local: --alias trusty
+    $b lxc exec inception -- lxc image copy ubuntu:16.04 local: --alias xenial
     $b lxc stop inception
     $b vagrant ssh -- sudo lvcreate -s -n inception0 inception/inception
     $b lxc snapshot inception inception0
