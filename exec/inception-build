@@ -31,7 +31,6 @@ function main {
     export INCEPTION_DREAM="$b"
     source "reality_common"
     set -x
-    $b $a recycle
     $b $a lxd init "${BASEBOX_NETWORK_PREFIX}"0
     $b $a docker init inception "${BASEBOX_NETWORK_PREFIX}1" $b "${BASEBOX_NETWORK_PREFIX}9"
     $b lxc stop inception
