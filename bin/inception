@@ -4,7 +4,7 @@ _shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
 source "$_shome/exec/inception_common"
 
 function main {
-  local shome="${_inception_home:-"$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"}"
+  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
 
   exec "$@"
