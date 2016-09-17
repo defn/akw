@@ -5,7 +5,7 @@ function main {
   source "$shome/script/profile"
 
   inception media "$@"
-  (cd && home remote "$1" vagrant ssh --)
+  (cd && home remote init "$1" vagrant ssh --)
   inception build "$@"
   inception recycle "$@"
 }
