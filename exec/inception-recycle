@@ -23,6 +23,7 @@ function main {
     source "reality_common"
     $b $a recycle
     $b $a lxd init "${BASEBOX_NETWORK_PREFIX}"0
+    $b vagrant reload
     $b $a docker init inception "${BASEBOX_NETWORK_PREFIX}1" $b "${BASEBOX_NETWORK_PREFIX}9"
 
     case "$b" in
