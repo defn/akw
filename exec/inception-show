@@ -1,0 +1,18 @@
+#!/usr/bin/env bash 
+
+function main { 
+  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
+  source "$shome/script/profile" 
+  source inception_common 
+
+  if [[ "$#" == 0 ]]; then
+    set -- plane van hotel snow
+  fi
+
+  export tmp_show="$(mktemp -d -t XXXXXX)"
+  trap 'rm -rf "$tmp_show"' EXIT
+  runmany 4 'exec >$tmp_show/$1; figlet $1; $1 vagrant ssh -- ip -o -f inet addr show fan-250; $1 lxc list' "$@"
+  (set +f; cat "$tmp_show"/*)
+}
+
+source sub "$BASH_SOURCE" "$@"
