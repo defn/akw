@@ -34,7 +34,7 @@ function main {
     $b $a recycle
     $b $a lxd init "${BASEBOX_NETWORK_PREFIX}"{0,9}
     $b vagrant ssh -- sudo systemctl restart lxd-bridge
-    $b $a docker init "$(dreamer $b)" "${BASEBOX_NETWORK_PREFIX}3" "$(dreamer $b)" "${BASEBOX_NETWORK_PREFIX}4" inception/inception0
+    $b $a docker init "$(dreamer $b)" "$(dreamer $b)" inception/inception0
     "$(dreamer $b)" $a lxd init
   done
 }
