@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+export INCEPTION_DREAM="${BASH_SOURCE##*/}"
+export BASEBOX_INSTANCE="${INCEPTION_DREAM}"
+
+function main {
+  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
+  source "$shome/script/profile"
+  source inception_common
+
+  limbo "$@"
+}
+
+if [[ -n "${VAGRANT_DEFAULT_PROVIDER:-}" ]]; then
+  source sub-chain reality "$@"
+else
+  case "$BASH_SOURCE" in
+    *plane|*fischer)
+      a=virtualbox
+      b=plane
+      ;;
+    *van|*yusuf)
+      a=virtualbox
+      b=van
+      ;;
+    *hotel|*arthur)
+      a=vmware
+      b=hotel
+      ;;
+    *snow|*eames)
+      a=parallels
+      b=snow
+      ;;
+  esac
+
+  export BASEBOX_DREAM="$b"
+  source sub-chain reality "$a" "$@"
+fi
