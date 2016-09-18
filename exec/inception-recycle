@@ -24,6 +24,7 @@ function main {
     $b $a recycle
     $b $a lxd init "${BASEBOX_NETWORK_PREFIX}"0 "${BASEBOX_NETWORK_PREFIX}"9
     $b vagrant ssh -- sudo systemctl restart lxd-bridge
+    $b vagrant ssh -- sudo ifup lxdbr0
     $b $a docker init inception "${BASEBOX_NETWORK_PREFIX}1" $b "${BASEBOX_NETWORK_PREFIX}9"
 
     case "$b" in
@@ -33,12 +34,6 @@ function main {
       snow) dreamer=eames ;;
     esac
     $b $a docker init "$dreamer" "${BASEBOX_NETWORK_PREFIX}2" "$dreamer" "${BASEBOX_NETWORK_PREFIX}3" inception/inception0
-    sleep 10
-
-		$b lxc list --format json \
-      | jq -r '.[] | .state.network.eth0.addresses[] | select(.scope == "global") | .address' \
-      | while read -r a; do
-          $b vagrant ssh -- sudo ip route replace "250.$(echo $a | cut -d. -f3-4).0/24" via "$a"; done
   done
 }
 
