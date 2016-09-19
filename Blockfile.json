@@ -2,7 +2,6 @@
   "require": [
     "docker",
     "limbo",
-    "limbo-lxd",
-    "limbo-docker"
+    "limbo-lxd"
   ]
 }

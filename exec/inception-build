@@ -32,17 +32,31 @@ function main {
     export INCEPTION_DREAM="$b"
     source "reality_common"
 
+    export BASEBOX_MACHINE=inception
+
     $b $a lxd init "${BASEBOX_NETWORK_PREFIX}"{0,9}
 
-    $b $a docker init inception $b
-    $b lxc exec inception  -- lxc image copy ubuntu:16.04 local: --alias xenial
+    $b $a docker init inception
+
+    $b lxc exec inception -- lxc image copy ubuntu:16.04 local: --alias xenial
+
     $b docker pull "${CACHE_VIP}:5001/ubuntu:xenial"
     $b docker tag "${CACHE_VIP}:5001/ubuntu:xenial" "ubuntu:xenial"
+    $b docker machine rm -f inception
+
+    tar cf - /vagrant/packages | $b lxc exec inception -- tar xvf - -C /
+    $b lxc exec inception -- chown -R ubuntu:ubuntu /vagrant
+
+    home remote init $b vagrant ssh --
+    local ip_lxd="$($b lxc list inception --format json | jq -r '.[].state.network.eth0.addresses[] | select(.family == "inet").address')"
+    ssh-keygen -R "$ip_lxd"
+    home remote init ssh -A -o StrictHostKeyChecking=no ubuntu@"$ip_lxd"
 
     $b lxc stop inception
 
     $b vagrant ssh -- sudo lvcreate -s -n inception0 inception/inception
     $b lxc snapshot inception inception0
+
     $b $a reuse vagrant
   done
 }
