@@ -44,10 +44,11 @@ function main {
     $b docker tag "${CACHE_VIP}:5001/ubuntu:xenial" "ubuntu:xenial"
     $b docker machine rm -f inception
 
+    home remote init $b vagrant ssh --
+
     tar cf - /vagrant/{packages,curl} | $b lxc exec inception -- tar xvf - -C /
     $b lxc exec inception -- chown -R ubuntu:ubuntu /vagrant
 
-    home remote init $b vagrant ssh --
     local ip_lxd="$($b lxc list inception --format json | jq -r '.[].state.network.eth0.addresses[] | select(.family == "inet").address')"
     ssh-keygen -R "$ip_lxd"
     home remote init ssh -A -o StrictHostKeyChecking=no ubuntu@"$ip_lxd"
