@@ -44,7 +44,7 @@ function main {
     $b docker tag "${CACHE_VIP}:5001/ubuntu:xenial" "ubuntu:xenial"
     $b docker machine rm -f inception
 
-    tar cf - /vagrant/packages | $b lxc exec inception -- tar xvf - -C /
+    tar cf - /vagrant/{packages,curl} | $b lxc exec inception -- tar xvf - -C /
     $b lxc exec inception -- chown -R ubuntu:ubuntu /vagrant
 
     home remote init $b vagrant ssh --
