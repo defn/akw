@@ -55,6 +55,8 @@ function main {
 
     $b lxc stop inception
 
+    $b vagrant ssh -- sudo rm -f /etc/default/lxd-bridge /etc/network/interfaces.d/99-limbo-fan.cfg
+
     $b vagrant ssh -- sudo lvcreate -s -n inception0 inception/inception
     $b lxc snapshot inception inception0
 
