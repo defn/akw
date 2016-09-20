@@ -40,9 +40,15 @@ function main {
     $b $a docker init "$(dreamer $b)" inception/inception0
     "$(dreamer $b)" $a lxd init
 
+    $b vagrant ssh -- ln -nfs ../sv/consul service/
+    $b vagrant ssh -- bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5')"
+    $b vagrant ssh -- screen -X -S home-script-server quit
+
     local ip_lxd="$($b lxc list "$(dreamer $b)" --format json | jq -r '.[].state.network."fan-250".addresses[] | select(.family == "inet").address')"
-    $b vagrant ssh -- setsid script/server screen
-    ssh ubuntu@"$ip_lxd" -- setsid script/server screen
+    ssh-keygen -R "$ip_lxd" || true
+    ssh -o StrictHostKeyChecking=no ubuntu@"$ip_lxd" -- ln -nfs ../sv/consul service/
+    ssh ubuntu@"$ip_lxd" -- bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5')"
+    ssh ubuntu@"$ip_lxd" -- screen -X -S home-script-server quit
   done
 }
 
