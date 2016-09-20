@@ -31,11 +31,18 @@ function main {
 
     export INCEPTION_DREAM="$b"
     source "reality_common"
+
     $b $a recycle
+
     $b $a lxd init "${BASEBOX_NETWORK_PREFIX}"{0,9}
     $b vagrant ssh -- sudo systemctl restart lxd-bridge
+
     $b $a docker init "$(dreamer $b)" inception/inception0
     "$(dreamer $b)" $a lxd init
+
+    local ip_lxd="$($b lxc list "$(dreamer $b)" --format json | jq -r '.[].state.network."fan-250".addresses[] | select(.family == "inet").address')"
+    $b vagrant ssh -- setsid script/server screen
+    ssh ubuntu@"$ip_lxd" -- setsid script/server screen
   done
 }
 
