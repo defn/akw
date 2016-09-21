@@ -6,28 +6,17 @@ function main {
   source inception_common
 
   if [[ "$#" == 0 ]]; then
-    set -- virtualbox vmware parallels
+    set -- plane virtualbox
   fi
 
-  for a in "$@"; do
-    case "$a" in
-      plane)
-        a=virtualbox
-        b=plane
-        ;;
-      virtualbox|van)
-        a=virtualbox
-        b=van
-        ;;
-      vmware|hotel)
-        a=vmware
-        b=hotel
-        ;;
-      parallels|snow) 
-        a=parallels
-        b=snow
-        ;;
-    esac
+  while [[ "$#" != 0 ]]; do
+    if [[ "$#" == 1 ]]; then
+      set -- "$@" virtualbox
+    fi
+
+    b="$1"; shift
+    a="$1"; shift
+
     $b $a rebase
   done
 }

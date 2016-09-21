@@ -6,7 +6,7 @@ function main {
   source inception_common
 
   export LIMBO_LINKED_CLONES=0
-  export BASEBOX_MACHINE=inception
+  export BASEBOX_MACHINE="${BASEBOX_NAME}"
 
   if [[ "$#" == 0 ]]; then
     set -- plane virtualbox
@@ -23,33 +23,31 @@ function main {
     export INCEPTION_DREAM="$b"
     source "reality_common"
 
-    $b $a lxd init "${BASEBOX_NETWORK_PREFIX}"{0,9}
-    $b vagrant ssh -- fanctl show | tail -n +2 | runmany 1 3 "$b"' vagrant ssh -- sudo fanctl down -u $2 -o $3'
-    $b vagrant ssh -- sudo systemctl restart lxd-bridge
+    $b $a lxd init yes
+    $b $a docker init
 
-    $b $a docker init inception
-
-    $b lxc exec inception -- lxc image copy ubuntu:16.04 local: --alias xenial
+    $b lxc exec "${BASEBOX_NAME}" -- lxc image copy ubuntu:16.04 local: --alias xenial
 
     $b docker pull "${CACHE_VIP}:5001/ubuntu:xenial"
     $b docker tag "${CACHE_VIP}:5001/ubuntu:xenial" "ubuntu:xenial"
-    $b docker machine rm -f inception
+    $b docker machine rm -f "${BASEBOX_NAME}"
 
-    home remote init $b vagrant ssh --
+    #home remote init $b vagrant ssh --
 
-    tar cf - /vagrant/{packages,curl} | $b lxc exec inception -- tar xvf - -C /
-    $b lxc exec inception -- chown -R ubuntu:ubuntu /vagrant
+    #tar cf - /vagrant/{packages,curl} | $b lxc exec "${BASEBOX_NAME}" -- tar xvf - -C /
+    #$b lxc exec "${BASEBOX_NAME}" -- chown -R ubuntu:ubuntu /vagrant
 
-    local ip_lxd="$($b lxc list inception --format json | jq -r '.[].state.network.eth0.addresses[] | select(.family == "inet").address')"
+    local ip_lxd="$($b lxc list "${BASEBOX_NAME}" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
     ssh-keygen -R "$ip_lxd"
-    home remote init ssh -A -o StrictHostKeyChecking=no ubuntu@"$ip_lxd"
+    ssh-keygen -R "$b"
+    #home remote init ssh -A -o StrictHostKeyChecking=no ubuntu@"$ip_lxd"
 
-    $b lxc stop inception
+    $b lxc stop "${BASEBOX_NAME}"
 
-    $b vagrant ssh -- sudo rm -f /etc/default/lxd-bridge /etc/network/interfaces.d/99-limbo-fan.cfg
+    $b vagrant ssh -- sudo rm -f /etc/network/interfaces.d/99-limbo-fan.cfg
 
-    $b vagrant ssh -- sudo lvcreate -s -n inception0 inception/inception
-    $b lxc snapshot inception inception0
+    $b vagrant ssh -- sudo lvcreate -s -n "${BASEBOX_NAME}0" "${BASEBOX_NAME}/${BASEBOX_NAME}"
+    $b lxc snapshot "${BASEBOX_NAME}" "${BASEBOX_NAME}0"
 
     $b $a reuse vagrant
   done
