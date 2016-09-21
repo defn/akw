@@ -45,7 +45,7 @@ function main {
     $b vagrant ssh -- screen -X -S home-script-server quit
     ssh-keygen -R $b
 
-    local ip_lxd="$($b lxc list "$(dreamer $b)" --format json | jq -r '.[].state.network."fan-250".addresses[] | select(.family == "inet").address')"
+    local ip_lxd="$($b lxc list "$(dreamer $b)" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
     ssh-keygen -R "$ip_lxd" || true
     ssh -o StrictHostKeyChecking=no ubuntu@"$ip_lxd" -- ln -nfs ../sv/consul service/
     ssh ubuntu@"$ip_lxd" -- bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5')"
