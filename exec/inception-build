@@ -32,15 +32,15 @@ function main {
     $b docker tag "${CACHE_VIP}:5001/ubuntu:xenial" "ubuntu:xenial"
     $b docker machine rm -f "${BASEBOX_NAME}"
 
-    #home remote init $b vagrant ssh --
+    home remote init $b vagrant ssh --
 
-    #tar cf - /vagrant/{packages,curl} | $b lxc exec "${BASEBOX_NAME}" -- tar xvf - -C /
-    #$b lxc exec "${BASEBOX_NAME}" -- chown -R ubuntu:ubuntu /vagrant
+    tar cf - /vagrant/{packages,curl} | $b lxc exec "${BASEBOX_NAME}" -- tar xvf - -C /
+    $b lxc exec "${BASEBOX_NAME}" -- chown -R ubuntu:ubuntu /vagrant
 
     local ip_lxd="$($b lxc list "${BASEBOX_NAME}" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
     ssh-keygen -R "$ip_lxd"
     ssh-keygen -R "$b"
-    #home remote init ssh -A -o StrictHostKeyChecking=no ubuntu@"$ip_lxd"
+    home remote init ssh -A -o StrictHostKeyChecking=no ubuntu@"$ip_lxd"
 
     $b lxc stop "${BASEBOX_NAME}"
 

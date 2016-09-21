@@ -34,9 +34,7 @@ function main {
 
     $b $a recycle
 
-    $b $a lxd init
-    $b vagrant ssh -- fanctl show | tail -n +2 | runmany 1 3 "$b"' vagrant ssh -- sudo fanctl down -u $2 -o $3'
-    $b vagrant ssh -- sudo systemctl restart lxd-bridge
+    $b $a lxd init yes
 
     $b $a docker init "$(dreamer $b)" inception/inception0
 

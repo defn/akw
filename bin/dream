@@ -18,21 +18,26 @@ else
     *plane|*fischer)
       a=virtualbox
       b=plane
+      c=fischer
       ;;
     *van|*yusuf)
       a=virtualbox
       b=van
+      c=yusuf
       ;;
     *hotel|*arthur)
       a=vmware
       b=hotel
+      c=arthur
       ;;
     *snow|*eames)
       a=parallels
       b=snow
+      c=eames
       ;;
   esac
 
   export BASEBOX_DREAM="$b"
+  export BASEBOX_DREAMER="$c"
   source sub-chain reality "$a" "$@"
 fi
