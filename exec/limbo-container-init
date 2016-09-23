@@ -105,7 +105,7 @@ function setup_vagrant_as_host {
   if_parent='fan-250'
   nm_lxd="${BASEBOX_DREAM}"
 
-  setup_fan_network
+  setup_fan_network_dhcp
   disable_lxd_bridge
   install_lxd_docker
   reload_vagrant_host
@@ -119,6 +119,13 @@ function setup_access {
   lxd_host lxc config set core.trust_password "$lxd_pass"
 }
 
+function setup_remote {
+  rm -rf "$LXD_CONF"
+  mkdir -p "$LXD_CONF"
+  lxc remote add --accept-certificate "$nm_lxd" "$ip_dream" --password="$lxd_pass"
+  lxc remote set-default "$nm_lxd" 
+}
+
 function setup_limbo_profile {
   "$@" lxc profile create limbo 2>/dev/null || true
   "$@" lxc profile set limbo user.user-data - < "$shome/cidata/user-data"
@@ -126,20 +133,26 @@ function setup_limbo_profile {
   "$@" lxc profile set limbo security.nesting true
   "$@" lxc profile set limbo user.network_mode "dhcp"
   "$@" lxc profile unset limbo environment.proxy_http
-  "$@" lxc profile device set llimbo eth0 parent "$if_parent"
+  "$@" lxc profile device add limbo eth0 nic nictype=bridged parent="$if_parent" || true
+  "$@" lxc profile device set limbo eth0 nictype bridged
+  "$@" lxc profile device set limbo eth0 parent "$if_parent"
   "$@" lxc profile device set limbo eth0 mtu 1498
 }
 
 function setup_xenial_image {
-  lxc image copy ubuntu:16.04 local: --alias xenial
+  lxc image copy ubuntu:16.04 default: --alias xenial
 }
 
 function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
 
+  set -x
+
   local nm_lxd="${BASEBOX_NAME}"
   local nm_snapshot=
+
+  local lxd_pass="${RANDOM}-$$-$(date +%s)"
 
   if [[ -n "${1:-}" ]]; then
     nm_lxd="$1"; shift
@@ -149,7 +162,9 @@ function main {
     nm_snapshot="$1"; shift
   fi
 
-  set -x
+  local fl_privileged="true"
+  local if_parent="br0"
+
 
   if [[ -n "$nm_snapshot" ]]; then
     local nm_snapshot_lvm=
@@ -188,8 +203,6 @@ function main {
 		ifup br0 || true
 		ifconfig -a	
 
-    lxd_host systemctl enable lxd.service
-
     vagrant_host sudo lvcreate -V100G -T -n "${nm_lxd}" inception/docker || true
     vagrant_host sudo mkdir -p "/mnt/${nm_lxd}"
     if vagrant_host sudo mkfs.ext4 "/dev/inception/${nm_lxd}"; then
@@ -208,9 +221,6 @@ function main {
         esac
       done
     fi
-
-    local fl_privileged="true"
-    local if_parent="br0"
 
     install_lxd_docker
     setup_user_access

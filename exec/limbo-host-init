@@ -6,7 +6,33 @@ function lxd_host {
   command "${host[@]}" "$@"
 }
 
-function setup_fan_network {
+function disable_cloud_init_network {
+    cat <<EOF | lxd_host tee /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+network: {config: disabled}
+EOF
+
+    cat <<EOF | lxd_host tee /etc/network/interfaces.d/50-cloud-init.cfg
+auto lo
+iface lo inet loopback
+EOF
+}
+
+function setup_fan_network_dhcp {
+  cat <<EOF | lxd_host tee /etc/network/interfaces.d/99-limbo-fan.cfg
+auto eth0
+iface eth0 inet manual
+
+auto br0
+iface br0 inet dhcp
+    bridge-ifaces eth0
+    bridge-ports eth0
+    bridge-ifaces eth0
+    bridge-ports eth0
+    up ifconfig eth0 up
+EOF
+}
+
+function setup_fan_network_static {
   cat <<EOF | lxd_host sudo tee /etc/network/interfaces.d/99-limbo-fan.cfg
 auto enp0s9
 iface enp0s9 inet manual
@@ -73,10 +99,42 @@ function setup_vagrant_as_host {
   if_parent='fan-250'
   nm_lxd="${BASEBOX_DREAM}"
 
-  setup_fan_network
+  setup_fan_network_static
   disable_lxd_bridge
   install_lxd_docker
   reload_vagrant_host
+}
+
+function setup_access {
+  lxd_host sudo usermod -aG lxd ubuntu
+  lxd_host sudo usermod -aG docker ubuntu
+  lxd_host sudo systemctl start lxd
+  lxd_host lxc config set core.https_address '[::]'
+  lxd_host lxc config set core.trust_password "$lxd_pass"
+}
+
+function setup_remote {
+  rm -rf "$LXD_CONF"
+  mkdir -p "$LXD_CONF"
+  lxc remote add --accept-certificate "$nm_lxd" "$ip_dream" --password="$lxd_pass"
+  lxc remote set-default "$nm_lxd" 
+}
+
+function setup_limbo_profile {
+  "$@" lxc profile create limbo 2>/dev/null || true
+  "$@" lxc profile set limbo user.user-data - < "$shome/cidata/user-data"
+  "$@" lxc profile set limbo security.privileged "$fl_privileged"
+  "$@" lxc profile set limbo security.nesting true
+  "$@" lxc profile set limbo user.network_mode "dhcp"
+  "$@" lxc profile unset limbo environment.proxy_http
+  "$@" lxc profile device add limbo eth0 nic nictype=bridged parent="$if_parent" || true
+  "$@" lxc profile device set limbo eth0 nictype bridged
+  "$@" lxc profile device set limbo eth0 parent "$if_parent"
+  "$@" lxc profile device set limbo eth0 mtu 1498
+}
+
+function setup_xenial_image {
+  lxc image copy ubuntu:16.04 default: --alias xenial
 }
 
 function main {
@@ -85,10 +143,10 @@ function main {
   
   set -x
 
-  local host
-  local ip_dream
   local fl_privileged
   local if_parent
+  local host
+  local ip_dream
   local nm_lxd
 
   case "${1:-}" in
@@ -98,29 +156,12 @@ function main {
 
   local lxd_pass="${RANDOM}-$$-$(date +%s)"
 
-  lxd_host sudo usermod -aG lxd ubuntu
-  lxd_host sudo usermod -aG docker ubuntu
-  lxd_host sudo systemctl start lxd
-  lxd_host lxc config set core.https_address '[::]'
-  lxd_host lxc config set core.trust_password "$lxd_pass"
+  setup_access
+  setup_remote
 
-  rm -rf "$LXD_CONF"
-  mkdir -p "$LXD_CONF"
-  lxc remote add --accept-certificate "$nm_lxd" "$ip_dream" --password="$lxd_pass"
-  lxc remote set-default "$nm_lxd" 
+  setup_limbo_profile
 
-  lxc profile create limbo 2>/dev/null || true
-  lxc profile set limbo user.user-data - < "$shome/cidata/user-data"
-  lxc profile set limbo security.privileged "$fl_privileged"
-  lxc profile set limbo security.nesting true
-  lxc profile set limbo user.network_mode "dhcp"
-  lxc profile unset limbo environment.proxy_http
-  lxc profile device add limbo eth0 nic nictype=bridged parent="$if_parent" || true
-  lxc profile device set limbo eth0 nictype bridged
-  lxc profile device set limbo eth0 parent "$if_parent"
-  lxc profile device set limbo eth0 mtu 1498
-
-  lxc image copy ubuntu:16.04 "$nm_lxd": --alias xenial
+  setup_xenial_image
 }
 
 source sub "$BASH_SOURCE" "$@"
