@@ -1,0 +1,253 @@
+#!/usr/bin/env bash
+
+function vagrant_host {
+  (unset VAGRANT_DEFAULT_PROVIDER; limbo vagrant ssh -- "$@")
+}
+
+function lxc {
+  limbo lxc "$@"
+}
+
+function lxd_host {
+  lxc exec "${nm_lxd}" -- "$@"
+}
+
+function disable_cloud_init_network {
+    cat <<EOF | lxd_host tee /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+network: {config: disabled}
+EOF
+
+    cat <<EOF | lxd_host tee /etc/network/interfaces.d/50-cloud-init.cfg
+auto lo
+iface lo inet loopback
+EOF
+}
+
+function setup_fan_network_dhcp {
+  cat <<EOF | lxd_host tee /etc/network/interfaces.d/99-limbo-fan.cfg
+auto eth0
+iface eth0 inet manual
+
+auto br0
+iface br0 inet dhcp
+    bridge-ifaces eth0
+    bridge-ports eth0
+    bridge-ifaces eth0
+    bridge-ports eth0
+    up ifconfig eth0 up
+EOF
+}
+
+function setup_fan_network_static {
+  cat <<EOF | lxd_host sudo tee /etc/network/interfaces.d/99-limbo-fan.cfg
+auto enp0s9
+iface enp0s9 inet manual
+    up fanctl up -o 250.0.0.0/8 -u "${BASEBOX_IP}/16" --dhcp
+    down fanctl down -o 250.0.0.0/8 -u "${BASEBOX_IP}/16"
+
+auto br0
+iface br0 inet static
+    address ${BASEBOX_IP}
+    gateway ${BASEBOX_IP%.*}.1
+    network ${BASEBOX_IP%.*}.0
+    gateway ${BASEBOX_IP%.*}.255
+    netmask 255.255.255.0
+    bridge-ifaces enp0s9
+    bridge-ports enp0s9
+    up ifconfig enp0s9 up
+EOF
+}
+
+function disable_lxd_bridge {
+  cat <<EOF | lxd_host sudo tee /etc/default/lxd-bridge
+USE_LXD_BRIDGE="false"
+LXD_BRIDGE="lxdbr0"
+UPDATE_PROFILE="false"
+LXD_CONFILE=""
+LXD_DOMAIN=""
+LXD_IPV4_ADDR=""
+LXD_IPV4_NETMASK=""
+LXD_IPV4_NETWORK=""
+LXD_IPV4_DHCP_RANGE=""
+LXD_IPV4_DHCP_MAX=""
+LXD_IPV4_NAT="true"
+LXD_IPV6_ADDR=""
+LXD_IPV6_MASK=""
+LXD_IPV6_NETWORK=""
+LXD_IPV6_NAT="false"
+LXD_IPV6_PROXY="false"
+EOF
+}
+
+function install_lxd_docker {
+  lxd_host sudo add-apt-repository -y ppa:ubuntu-lxc/lxd-stable
+  lxd_host sudo apt update
+  lxd_host sudo env DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y lxd zfsutils-linux criu lxd-tools docker.io
+  lxd_host sudo env DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y
+}
+
+function reload_vagrant_host {
+  "${BASEBOX_DREAM}" vagrant reload
+}
+
+function setup_lxd_as_host {
+  host=("${BASEBOX_DREAM}" lxc exec "${BASEBOX_DREAMER}" --)
+  ip_dream="$("${BASEBOX_DREAM}" lxc list --format=json "${BASEBOX_DREAMER}" | jq -r '[.[].state.network | [.eth0//[],.br0//[]]] | flatten[].addresses[] | select(.family == "inet").address')"
+  fl_privileged=true
+  if_parent='br0'
+  nm_lxd="${BASEBOX_DREAMER}"
+}
+
+function setup_vagrant_as_host {
+  host=("${BASEBOX_DREAM}" vagrant ssh --)
+  ip_dream="$BASEBOX_IP"
+  fl_privileged=false
+  if_parent='fan-250'
+  nm_lxd="${BASEBOX_DREAM}"
+
+  setup_fan_network
+  disable_lxd_bridge
+  install_lxd_docker
+  reload_vagrant_host
+}
+
+function setup_access {
+  lxd_host sudo usermod -aG lxd ubuntu
+  lxd_host sudo usermod -aG docker ubuntu
+  lxd_host sudo systemctl start lxd
+  lxd_host lxc config set core.https_address '[::]'
+  lxd_host lxc config set core.trust_password "$lxd_pass"
+}
+
+function setup_limbo_profile {
+  "$@" lxc profile create limbo 2>/dev/null || true
+  "$@" lxc profile set limbo user.user-data - < "$shome/cidata/user-data"
+  "$@" lxc profile set limbo security.privileged "$fl_privileged"
+  "$@" lxc profile set limbo security.nesting true
+  "$@" lxc profile set limbo user.network_mode "dhcp"
+  "$@" lxc profile unset limbo environment.proxy_http
+  "$@" lxc profile device set llimbo eth0 parent "$if_parent"
+  "$@" lxc profile device set limbo eth0 mtu 1498
+}
+
+function setup_xenial_image {
+  lxc image copy ubuntu:16.04 local: --alias xenial
+}
+
+function main {
+  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
+  source "$shome/script/profile"
+
+  local nm_lxd="${BASEBOX_NAME}"
+  local nm_snapshot=
+
+  if [[ -n "${1:-}" ]]; then
+    nm_lxd="$1"; shift
+  fi
+
+  if [[ -n "${1:-}" ]]; then
+    nm_snapshot="$1"; shift
+  fi
+
+  set -x
+
+  if [[ -n "$nm_snapshot" ]]; then
+    local nm_snapshot_lvm=
+    if [[ -n "${1:-}" ]]; then
+      nm_snapshot_lvm="$1"; shift
+    else
+      nm_snapshot_lvm="$nm_snapshot"
+    fi
+
+    if ! lxc copy "$nm_snapshot" "${nm_lxd}"; then
+      lxc stop "${nm_lxd}"
+    fi
+    vagrant_host sudo lvcreate -s -n "${nm_lxd}" "$nm_snapshot_lvm"
+    vagrant_host sudo lvchange -ay -K "inception/${nm_lxd}"
+    lxc config device set "${nm_lxd}" docker source "/dev/inception/${nm_lxd}"
+    lxc start "${nm_lxd}"
+  else
+    lxc launch xenial "${nm_lxd}" -p default -p docker -p limbo -c boot.autostart=false
+    lxd_host touch /root/.cloud-init.hostname
+    while true; do
+      case "$(echo | lxd_host systemctl is-active cloud-final.service)" in
+        active|failed) break ;;
+        *) sleep 2 ;;
+      esac
+    done
+
+    for a in 1 2; do
+      lxd_host rm -f /var/lib/cloud/instance
+      lxd_host cloud-init init
+    done
+
+    disable_cloud_init_network
+    setuo_fan_network_dhcp
+
+		ifdown eth0 || true
+		ifup br0 || true
+		ifconfig -a	
+
+    lxd_host systemctl enable lxd.service
+
+    vagrant_host sudo lvcreate -V100G -T -n "${nm_lxd}" inception/docker || true
+    vagrant_host sudo mkdir -p "/mnt/${nm_lxd}"
+    if vagrant_host sudo mkfs.ext4 "/dev/inception/${nm_lxd}"; then
+      vagrant_host sudo mount "/dev/inception/${nm_lxd}" "/mnt/${nm_lxd}"
+      vagrant_host sudo chown -R 100000:100000 "/mnt/${nm_lxd}"
+      vagrant_host sudo umount "/mnt/${nm_lxd}"
+    fi
+
+    if lxd_host mkdir /var/lib/docker 2>/dev/null; then
+      lxc config device add "${nm_lxd}" docker disk source="/dev/inception/${nm_lxd}" path=/var/lib/docker
+      lxc restart "${nm_lxd}"
+      while true; do
+        case "$(echo | lxd_host systemctl is-active cloud-final.service)" in
+          active|failed) break ;;
+          *) sleep 2 ;;
+        esac
+      done
+    fi
+
+    local fl_privileged="true"
+    local if_parent="br0"
+
+    install_lxd_docker
+    setup_user_access
+    setup_limbo_profile lxd_host
+  fi
+
+  limbo network init
+
+  while true; do
+    case "$(echo | lxd_host systemctl is-active cloud-final.service)" in
+      active|failed) break ;;
+      *) sleep 2 ;;
+    esac
+  done
+
+  for a in 1 2; do
+    lxd_host rm -f /var/lib/cloud/instance
+    lxd_host cloud-init init
+  done
+
+  local ip_lxd="$(lxc list "${nm_lxd}" --format json | jq -r '[.[].state.network.br0.addresses[] | select(.family == "inet").address][-1]')"
+  ssh-keygen -R "$ip_lxd"
+
+  lxd_host rm -f /etc/docker/key.json
+  docker machine rm -f "$nm_lxd" 2>/dev/null || true
+
+  lxd_host sudo systemctl start docker.service
+  docker machine create --driver generic --generic-ip-address "$ip_lxd" --generic-ssh-user ubuntu \
+    --engine-install-url="" \
+    --engine-storage-driver="overlay" \
+    --engine-opt="bridge=br0" \
+    --engine-opt="mtu=1480" \
+    --engine-opt="iptables=false" \
+    --engine-opt="fixed-cidr=250.$(lxc list --format json "${nm_lxd}" | jq -r '[.[].state.network.br0.addresses[] | select(.scope == "global").address][-1]' | cut -d. -f3-4).0/24" \
+    --engine-opt="insecure-registry=172.28.128.1:5000" \
+    --engine-opt="insecure-registry=172.28.128.1:5001" \
+    "$nm_lxd"
+}
+
+source sub "$BASH_SOURCE" "$@"

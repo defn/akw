@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+
+host=""
+
+function lxd_host {
+  command "${host[@]}" "$@"
+}
+
+function setup_fan_network {
+  cat <<EOF | lxd_host sudo tee /etc/network/interfaces.d/99-limbo-fan.cfg
+auto enp0s9
+iface enp0s9 inet manual
+    up fanctl up -o 250.0.0.0/8 -u "${BASEBOX_IP}/16" --dhcp
+    down fanctl down -o 250.0.0.0/8 -u "${BASEBOX_IP}/16"
+
+auto br0
+iface br0 inet static
+    address ${BASEBOX_IP}
+    gateway ${BASEBOX_IP%.*}.1
+    network ${BASEBOX_IP%.*}.0
+    gateway ${BASEBOX_IP%.*}.255
+    netmask 255.255.255.0
+    bridge-ifaces enp0s9
+    bridge-ports enp0s9
+    up ifconfig enp0s9 up
+EOF
+}
+
+function disable_lxd_bridge {
+  cat <<EOF | lxd_host sudo tee /etc/default/lxd-bridge
+USE_LXD_BRIDGE="false"
+LXD_BRIDGE="lxdbr0"
+UPDATE_PROFILE="false"
+LXD_CONFILE=""
+LXD_DOMAIN=""
+LXD_IPV4_ADDR=""
+LXD_IPV4_NETMASK=""
+LXD_IPV4_NETWORK=""
+LXD_IPV4_DHCP_RANGE=""
+LXD_IPV4_DHCP_MAX=""
+LXD_IPV4_NAT="true"
+LXD_IPV6_ADDR=""
+LXD_IPV6_MASK=""
+LXD_IPV6_NETWORK=""
+LXD_IPV6_NAT="false"
+LXD_IPV6_PROXY="false"
+EOF
+}
+
+function install_lxd_docker {
+  lxd_host sudo add-apt-repository -y ppa:ubuntu-lxc/lxd-stable
+  lxd_host sudo apt update
+  lxd_host sudo env DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y lxd zfsutils-linux criu lxd-tools docker.io
+  lxd_host sudo env DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y
+}
+
+function reload_vagrant_host {
+  "${BASEBOX_DREAM}" vagrant reload
+}
+
+function setup_lxd_as_host {
+  host=("${BASEBOX_DREAM}" lxc exec "${BASEBOX_DREAMER}" --)
+  ip_dream="$("${BASEBOX_DREAM}" lxc list --format=json "${BASEBOX_DREAMER}" | jq -r '[.[].state.network | [.eth0//[],.br0//[]]] | flatten[].addresses[] | select(.family == "inet").address')"
+  fl_privileged=true
+  if_parent='br0'
+  nm_lxd="${BASEBOX_DREAMER}"
+}
+
+function setup_vagrant_as_host {
+  host=("${BASEBOX_DREAM}" vagrant ssh --)
+  ip_dream="$BASEBOX_IP"
+  fl_privileged=false
+  if_parent='fan-250'
+  nm_lxd="${BASEBOX_DREAM}"
+
+  setup_fan_network
+  disable_lxd_bridge
+  install_lxd_docker
+  reload_vagrant_host
+}
+
+function main {
+  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
+  source "$shome/script/profile"
+  
+  set -x
+
+  local host
+  local ip_dream
+  local fl_privileged
+  local if_parent
+  local nm_lxd
+
+  case "${1:-}" in
+    vagrant|dream) setup_vagrant_as_host ;;
+         dreamer*) setup_lxd_as_host ;;
+  esac
+
+  local lxd_pass="${RANDOM}-$$-$(date +%s)"
+
+  lxd_host sudo usermod -aG lxd ubuntu
+  lxd_host sudo usermod -aG docker ubuntu
+  lxd_host sudo systemctl start lxd
+  lxd_host lxc config set core.https_address '[::]'
+  lxd_host lxc config set core.trust_password "$lxd_pass"
+
+  rm -rf "$LXD_CONF"
+  mkdir -p "$LXD_CONF"
+  lxc remote add --accept-certificate "$nm_lxd" "$ip_dream" --password="$lxd_pass"
+  lxc remote set-default "$nm_lxd" 
+
+  lxc profile create limbo 2>/dev/null || true
+  lxc profile set limbo user.user-data - < "$shome/cidata/user-data"
+  lxc profile set limbo security.privileged "$fl_privileged"
+  lxc profile set limbo security.nesting true
+  lxc profile set limbo user.network_mode "dhcp"
+  lxc profile unset limbo environment.proxy_http
+  lxc profile device add limbo eth0 nic nictype=bridged parent="$if_parent" || true
+  lxc profile device set limbo eth0 nictype bridged
+  lxc profile device set limbo eth0 parent "$if_parent"
+  lxc profile device set limbo eth0 mtu 1498
+
+  lxc image copy ubuntu:16.04 "$nm_lxd": --alias xenial
+}
+
+source sub "$BASH_SOURCE" "$@"

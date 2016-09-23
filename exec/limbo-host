@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+unset http_proxy https_proxy
+
+_lxc_shome="${_limbo_home:-"$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"}"
+export LXD_CONF="$_lxc_shome/.lxc/$BASEBOX_INSTANCE" 
+mkdir -p "$LXD_CONF"
+
+source sub "$BASH_SOURCE" "$@"
