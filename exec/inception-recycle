@@ -2,7 +2,7 @@
 
 function dreamer {
   local b="$1"; shift
-  case "$b" in
+  case "$dream" in
     plane) echo fischer ;;
     van) echo yusuf ;;
     hotel) echo arthur ;;
@@ -17,6 +17,8 @@ function main {
 
   export LIMBO_LINKED_CLONES=1
 
+  set -x
+
   if [[ "$#" == 0 ]]; then
     set -- plane virtualbox
   fi
@@ -26,31 +28,32 @@ function main {
       set -- "$@" virtualbox
     fi
 
-    b="$1"; shift
+    dream="$1"; shift
     a="$1"; shift
+    dreamer="$(dreamer $dream)"
 
-    export INCEPTION_DREAM="$b"
+    export INCEPTION_DREAM="$dream"
     source "reality_common"
 
-    $b $a recycle
+    $dream $a recycle
 
-    $b $a host init vagrant
-    $b $a container init "$(dreamer $b)" inception/inception0
+    $dream $a host init dream
+    $dream $a container init "$dreamer" inception/inception0
 
-    $b vagrant ssh -- ln -nfs ../sv/consul service/
-    $b vagrant ssh -- bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5')"
-    $b vagrant ssh -- screen -X -S home-script-server quit
-    ssh-keygen -R $b
+    $dream vagrant ssh -- ln -nfs ../sv/consul service/
+    $dream vagrant ssh -- bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5')"
+    $dream vagrant ssh -- screen -X -S home-script-server quit
+    ssh-keygen -R $dream
 
-    "$(dreamer $b)" $a host init
+    "$dreamer" $a host init dreamer
 
-    local ip_lxd="$($b lxc list "$(dreamer $b)" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
-    ssh-keygen -R "$ip_lxd" || true
-    ssh -o StrictHostKeyChecking=no ubuntu@"$ip_lxd" -- ln -nfs ../sv/consul service/
-    ssh ubuntu@"$ip_lxd" -- bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5')"
-    ssh ubuntu@"$ip_lxd" -- screen -X -S home-script-server quit
-    ssh-keygen -R "$(dreamer $b)"
+    local ip_dreamer="$($dream lxc list "$dreamer" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
+    ssh-keygen -R "$ip_dreamer" || true
+    ssh -o StrictHostKeyChecking=no ubuntu@"$ip_dreamer" -- ln -nfs ../sv/consul service/
+    ssh ubuntu@"$ip_dreamer" -- bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5')"
+    ssh ubuntu@"$ip_dreamer" -- screen -X -S home-script-server quit
+    ssh-keygen -R "$dreamer"
   done
 }
 
-source sub "$BASH_SOURCE" "$@"
+source sub "$dreamASH_SOURCE" "$@"
