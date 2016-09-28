@@ -10,6 +10,12 @@ function dreamer {
   esac
 }
 
+function setup_consul {
+  "$@" ln -nfs ../sv/consul service/
+  "$@" bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5')"
+  "$@" screen -X -S home-script-server quit
+}
+
 function main { 
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile" 
@@ -37,23 +43,18 @@ function main {
 
     $dream $a recycle
 
-    $dream $a host init dream
-    $dream $a container init "$dreamer" inception/inception0
+    $dream $a init $dreamer
 
-    $dream vagrant ssh -- ln -nfs ../sv/consul service/
-    $dream vagrant ssh -- bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5')"
-    $dream vagrant ssh -- screen -X -S home-script-server quit
+    ssh-keygen -R $dream
+    setup_consul $dream vagrant ssh --
     ssh-keygen -R $dream
 
-    "$dreamer" $a host init dreamer
-
     local ip_dreamer="$($dream lxc list "$dreamer" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
-    ssh-keygen -R "$ip_dreamer" || true
-    ssh -o StrictHostKeyChecking=no ubuntu@"$ip_dreamer" -- ln -nfs ../sv/consul service/
-    ssh ubuntu@"$ip_dreamer" -- bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5')"
-    ssh ubuntu@"$ip_dreamer" -- screen -X -S home-script-server quit
+    ssh-keygen -R "$ip_dreamer"
+    setup_consul ssh -o StrictHostKeyChecking=no ubuntu@"$ip_dreamer" --
+    ssh-keygen -R "$ip_dreamer"
     ssh-keygen -R "$dreamer"
   done
 }
 
-source sub "$dreamASH_SOURCE" "$@"
+source sub "$BASH_SOURCE" "$@"
