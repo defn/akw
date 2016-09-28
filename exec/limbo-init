@@ -217,6 +217,28 @@ function ip_lxd {
   ip_dream="$("${BASEBOX_DREAM}" lxc list --format=json "${BASEBOX_DREAMER}" | jq -r '[[.[].state.network | [.br0//[],.eth0//[]]] | flatten[].addresses | map(select(.family == "inet"))] | flatten[0].address')"
 }
 
+function setup_docker {
+  lxd_host sudo rm -f /etc/docker/key.json
+  docker machine rm -f "$nm_lxd" 2>/dev/null || true
+
+  case "$ip_dream" in
+    250.*) fixed_cidr="${ip_dream%.*}.0" ;;
+        *) fixed_cidr="250.${ip_dream#*.*.}.0" ;;
+  esac
+
+  lxd_host sudo systemctl start docker.service
+  docker machine create --driver generic --generic-ip-address "$ip_dream" --generic-ssh-user ubuntu \
+    --engine-install-url="" \
+    --engine-storage-driver="overlay" \
+    --engine-opt="bridge=$if_parent" \
+    --engine-opt="mtu=1480" \
+    --engine-opt="iptables=false" \
+    --engine-opt="fixed-cidr=${fixed_cidr}/24" \
+    --engine-opt="insecure-registry=${CACHE_VIP}:5000" \
+    --engine-opt="insecure-registry=${CACHE_VIP}:5001" \
+    "$nm_lxd"
+}
+
 function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
@@ -256,6 +278,7 @@ function main {
       ip_dream="$BASEBOX_IP"
       setup_limbo_from_vagrant static lxd_host
       setup_lxd_docker lxc_remote
+      setup_docker
       ;;
     "${BASEBOX_NAME}") # inception
       main "${BASEBOX_DREAM}"
@@ -263,6 +286,7 @@ function main {
       setup_limbo_from_scratch
       setup_lxd_docker lxd_host
       ip_lxd
+      setup_docker
       ;;
     *) # fischer
       main "${BASEBOX_DREAM}"
@@ -271,6 +295,7 @@ function main {
       local nm_snapshot_lvm="${BASEBOX_NAME}/${BASEBOX_NAME}0"
       setup_limbo_from_snapshot
       ip_lxd
+      setup_docker
       ;;
   esac
   # end
@@ -280,26 +305,6 @@ function main {
   run_cloud_init lxd_host
 
   ssh-keygen -R "$ip_dream"
-
-  lxd_host sudo rm -f /etc/docker/key.json
-  docker machine rm -f "$nm_lxd" 2>/dev/null || true
-
-  case "$ip_dream" in
-    250.*) fixed_cidr="${ip_dream%.*}.0" ;;
-        *) fixed_cidr="250.${ip_dream#*.*.}.0" ;;
-  esac
-
-  lxd_host sudo systemctl start docker.service
-  docker machine create --driver generic --generic-ip-address "$ip_dream" --generic-ssh-user ubuntu \
-    --engine-install-url="" \
-    --engine-storage-driver="overlay" \
-    --engine-opt="bridge=$if_parent" \
-    --engine-opt="mtu=1480" \
-    --engine-opt="iptables=false" \
-    --engine-opt="fixed-cidr=${fixed_cidr}/24" \
-    --engine-opt="insecure-registry=${CACHE_VIP}:5000" \
-    --engine-opt="insecure-registry=${CACHE_VIP}:5001" \
-    "$nm_lxd"
 }
 
 source sub "$BASH_SOURCE" "$@"

@@ -44,14 +44,16 @@ function main {
     $dream $a recycle
 
     $dream $a init $dreamer
+    $dreamer $a init lxd
 
     ssh-keygen -R $dream
     setup_consul $dream vagrant ssh --
-    ssh-keygen -R $dream
 
     local ip_dreamer="$($dream lxc list "$dreamer" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
     ssh-keygen -R "$ip_dreamer"
     setup_consul ssh -o StrictHostKeyChecking=no ubuntu@"$ip_dreamer" --
+
+    ssh-keygen -R $dream
     ssh-keygen -R "$ip_dreamer"
     ssh-keygen -R "$dreamer"
   done
