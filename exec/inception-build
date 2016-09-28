@@ -25,10 +25,14 @@ function main {
 
     $b $a init "$b"
 
-    $b lxc exec "${BASEBOX_NAME}" -- lxc image copy ubuntu:16.04 local: --alias xenial
+    $b vagrant ssh -- lxc image copy ubuntu:16.04 local: --alias xenial
+    $b vagrant ssh -- docker pull "${CACHE_VIP}:5001/ubuntu:xenial"
+    $b vagrant ssh -- docker tag "${CACHE_VIP}:5001/ubuntu:xenial" "ubuntu:xenial"
 
-    $b docker pull "${CACHE_VIP}:5001/ubuntu:xenial"
-    $b docker tag "${CACHE_VIP}:5001/ubuntu:xenial" "ubuntu:xenial"
+    $b lxc exec "${BASEBOX_NAME}" -- lxc image copy ubuntu:16.04 local: --alias xenial
+    $b lxc exec "${BASEBOX_NAME}" -- docker pull "${CACHE_VIP}:5001/ubuntu:xenial"
+    $b lxc exec "${BASEBOX_NAME}" -- docker tag "${CACHE_VIP}:5001/ubuntu:xenial" "ubuntu:xenial"
+
     $b docker machine rm -f "${BASEBOX_NAME}"
 
     home remote init $b vagrant ssh --
