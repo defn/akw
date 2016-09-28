@@ -278,6 +278,7 @@ function main {
       ip_dream="$BASEBOX_IP"
       setup_limbo_from_vagrant static lxd_host
       setup_lxd_docker lxc_remote
+      limbo network init
       setup_docker
       ;;
     "${BASEBOX_NAME}") # inception
@@ -300,11 +301,8 @@ function main {
   esac
   # end
 
-  limbo network init
   wait_cloud_init lxd_host
   run_cloud_init lxd_host
-
-  ssh-keygen -R "$ip_dream"
 }
 
 source sub "$BASH_SOURCE" "$@"
