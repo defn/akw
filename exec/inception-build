@@ -5,6 +5,8 @@ function main {
   source "$shome/script/profile"
   source inception_common
 
+  set -x
+
   export LIMBO_LINKED_CLONES=0
   export BASEBOX_MACHINE="${BASEBOX_NAME}"
 
@@ -26,12 +28,7 @@ function main {
     $b $a init "$b"
 
     $b vagrant ssh -- lxc image copy ubuntu:16.04 local: --alias xenial
-    $b vagrant ssh -- docker pull "${CACHE_VIP}:5001/ubuntu:xenial"
-    $b vagrant ssh -- docker tag "${CACHE_VIP}:5001/ubuntu:xenial" "ubuntu:xenial"
-
     $b lxc exec "${BASEBOX_NAME}" -- lxc image copy ubuntu:16.04 local: --alias xenial
-    $b lxc exec "${BASEBOX_NAME}" -- docker pull "${CACHE_VIP}:5001/ubuntu:xenial"
-    $b lxc exec "${BASEBOX_NAME}" -- docker tag "${CACHE_VIP}:5001/ubuntu:xenial" "ubuntu:xenial"
 
     $b docker machine rm -f "${BASEBOX_NAME}"
 
@@ -46,7 +43,6 @@ function main {
     home remote init ssh -A -o StrictHostKeyChecking=no ubuntu@"$ip_lxd"
 
     $b lxc stop "${BASEBOX_NAME}"
-
     $b vagrant ssh -- sudo rm -f /etc/network/interfaces.d/99-limbo-fan.cfg
 
     $b vagrant ssh -- sudo lvcreate -s -n "${BASEBOX_NAME}0" "${BASEBOX_NAME}/${BASEBOX_NAME}"

@@ -3,10 +3,6 @@
 function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
-
-  if [[ -d "$$MACHINE_STORAGE_PATH" ]]; then
-    rm -rf "$MACHINE_STORAGE_PATH"
-  fi
 }
 
 source sub "$BASH_SOURCE" "$@"
