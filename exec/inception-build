@@ -25,28 +25,22 @@ function main {
     export INCEPTION_DREAM="$b"
     source "reality_common"
 
-    $b $a init "$b"
-
-    $b vagrant ssh -- lxc image copy ubuntu:16.04 local: --alias xenial
-    $b lxc exec "${BASEBOX_NAME}" -- lxc image copy ubuntu:16.04 local: --alias xenial
-
-    $b docker machine rm -f "${BASEBOX_NAME}"
+    $b $a init
 
     home remote init $b vagrant ssh --
 
-    tar cf - /vagrant/{packages,curl} | $b lxc exec "${BASEBOX_NAME}" -- tar xvf - -C /
-    $b lxc exec "${BASEBOX_NAME}" -- chown -R ubuntu:ubuntu /vagrant
+    tar cf - /vagrant/{packages,curl} | $b lxc exec "${b}:${BASEBOX_NAME}" -- tar xvf - -C /
+    $b lxc exec "${b}:${BASEBOX_NAME}" -- chown -R ubuntu:ubuntu /vagrant
 
-    local ip_lxd="$($b lxc list "${BASEBOX_NAME}" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
+    local ip_lxd="$($b lxc list "${b}:${BASEBOX_NAME}" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
     ssh-keygen -R "$ip_lxd"
     ssh-keygen -R "$b"
     home remote init ssh -A -o StrictHostKeyChecking=no ubuntu@"$ip_lxd"
 
-    $b lxc stop "${BASEBOX_NAME}"
     $b vagrant ssh -- sudo rm -f /etc/network/interfaces.d/99-limbo-fan.cfg
 
-    $b vagrant ssh -- sudo lvcreate -s -n "${BASEBOX_NAME}0" "${BASEBOX_NAME}/${BASEBOX_NAME}"
-    $b lxc snapshot "${BASEBOX_NAME}" "${BASEBOX_NAME}0"
+    $b lxc stop "${b}:${BASEBOX_NAME}"
+    $b lxc snapshot "${b}:${BASEBOX_NAME}" "${BASEBOX_NAME}0"
 
     $b $a reuse vagrant
   done

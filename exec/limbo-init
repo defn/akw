@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
-function vagrant_host {
-  (unset VAGRANT_DEFAULT_PROVIDER; limbo vagrant ssh -- "$@")
+
+nm_lxd=
+ip_dream=
+host=""
+
+function lxd_host {
+  (command "${host[@]}" "$@")
 }
 
-host=""
-function lxd_host {
-  command "${host[@]}" "$@"
+function lxc {
+  (env https_proxy= lxc "$@")
+}
+
+function vagrant_host {
+  (unset VAGRANT_DEFAULT_PROVIDER; limbo vagrant ssh -- "$@")
 }
 
 function disable_cloud_init_network {
@@ -35,11 +43,18 @@ EOF
 }
 
 function setup_fan_network_static {
+  cat <<EOF | "$@" sudo tee /etc/network/fan
+${BASEBOX_IP}/16 250.0.0.0/8 --enable --dhcp
+${BASEBOX_IP}/16 251.0.0.0/8 --enable
+${BASEBOX_IP}/16 252.0.0.0/8 --enable
+${BASEBOX_IP}/16 253.0.0.0/8 --enable
+${BASEBOX_IP}/16 254.0.0.0/8 --enable
+${BASEBOX_IP}/16 255.0.0.0/8 --enable
+EOF
+
   cat <<EOF | "$@" sudo tee /etc/network/interfaces.d/99-limbo-fan.cfg
 auto enp0s9
 iface enp0s9 inet manual
-    up fanctl up -o 250.0.0.0/8 -u "${BASEBOX_IP}/16" --dhcp
-    down fanctl down -o 250.0.0.0/8 -u "${BASEBOX_IP}/16"
 
 auto br0
 iface br0 inet static
@@ -88,7 +103,7 @@ function reload_vagrant_host {
 
 function setup_limbo_from_lxd {
   host=(lxc exec "${BASEBOX_DREAM}:${BASEBOX_DREAMER}" --)
-  lxc list --format=json "${BASEBOX_DREAMER}"
+  lxc list --format=json "${BASEBOX_DREAM}:${BASEBOX_DREAMER}"
   fl_privileged=true
   if_parent='br0'
   ip_lxd
@@ -108,13 +123,18 @@ function setup_limbo_from_vagrant {
   reload_vagrant_host
   wait_cloud_init lxd_host
   run_cloud_init lxd_host
+  lxd_host sudo ifup br0 || true
+  lxd_host sudo fanctl up -a
+  lxd_host ifconfig -a
 }
 
 function setup_limbo_from_snapshot {
   host=(lxc exec "${BASEBOX_DREAM}:${nm_lxd}" --)
-  lxc copy "$nm_snapshot" "${nm_lxd}"
-  lxc start "${nm_lxd}"
+  lxc copy "${BASEBOX_DREAM}:$nm_snapshot" "${BASEBOX_DREAM}:${nm_lxd}"
+  lxc start "${BASEBOX_DREAM}:${nm_lxd}"
   wait_cloud_init lxd_host
+  lxd_host ifdown br0 || true
+  lxd_host ifup br0 || true
   ip_lxd
 }
 
@@ -141,6 +161,7 @@ function setup_access {
 }
 
 function setup_remote {
+  "$@" lxc remote set-default local
   "$@" lxc remote remove "$nm_lxd" || true
   "$@" lxc remote add --accept-certificate --password="$lxd_pass" "$nm_lxd" "$ip_dream" 
 }
@@ -152,7 +173,7 @@ function setup_limbo_profile {
   lxc profile set "${nm_lxd}":limbo security.nesting true
   lxc profile set "${nm_lxd}":limbo user.network_mode "dhcp"
   lxc profile unset "${nm_lxd}":limbo environment.proxy_http
-  "$@" lxc profile device add limbo eth0 nic nictype=bridged parent="$if_parent" || true
+  if "$@" lxc profile device add limbo eth0 nic nictype=bridged parent="$if_parent"; then true; fi
   "$@" lxc profile device set limbo eth0 nictype bridged
   "$@" lxc profile device set limbo eth0 parent "$if_parent"
   "$@" lxc profile device set limbo eth0 mtu 1498
@@ -235,17 +256,13 @@ function main {
   local lxd_pass="ubuntu"
   local fl_privileged="true"
   local if_parent="br0"
-  local nm_lxd
 
   # install
-  local host
-  local ip_dream
-  local kind_of_host="$1"; shift
+  local kind_of_host="${1:-}"
   case "${kind_of_host}" in
-    lxd) 
-      nm_lxd="${BASEBOX_DREAMER}"
-      setup_limbo_from_lxd
-      setup_lxd_docker
+    "")
+      main "${BASEBOX_DREAM}"
+      main "${BASEBOX_NAME}"
       ;;
     "${BASEBOX_DREAM}")
       nm_lxd="${BASEBOX_DREAM}" # plane
@@ -261,6 +278,19 @@ function main {
       setup_lxd_docker
       setup_docker
       ;;
+    lxd)
+      nm_lxd="${BASEBOX_DREAMER}"
+      setup_limbo_from_lxd
+      setup_lxd_docker
+      ;;
+    test)
+      nm_lxd="${BASEBOX_DREAM}" # plane
+      ip_dream="$BASEBOX_IP"
+      host=("${BASEBOX_DREAM}" vagrant ssh --)
+      fl_privileged=false
+      if_parent='fan-250'
+      setup_limbo_profile lxd_host
+      ;;
     *) # fischer
       nm_lxd="${kind_of_host}"
       local nm_snapshot="${BASEBOX_NAME}/${BASEBOX_NAME}0"
@@ -268,10 +298,6 @@ function main {
       setup_docker
       ;;
   esac
-  # end
-
-  wait_cloud_init lxd_host
-  run_cloud_init lxd_host
 }
 
 source sub "$BASH_SOURCE" "$@"
