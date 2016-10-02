@@ -43,6 +43,8 @@ function main {
 
     $dream $a recycle
 
+    export LIMBO_FAST=1
+
     ssh-keygen -R $dream || true
     $dream $a init $dream
     ssh-keygen -R $dream || true
