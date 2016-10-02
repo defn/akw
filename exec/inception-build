@@ -46,7 +46,6 @@ function main {
     $b lxc exec "${b}:${BASEBOX_NAME}" -- rm -rf /vagrant
 
     # publish container as image
-    $b lxc stop "${b}:${BASEBOX_NAME}"
     $b lxc snapshot "${b}:${BASEBOX_NAME}" "${BASEBOX_NAME}X"
     time $b lxc publish "${b}:${BASEBOX_NAME}/${BASEBOX_NAME}X" "${BASEBOX_NAME}:" --alias "${BASEBOX_NAME}"
     $b lxc snapshot "${b}:${BASEBOX_NAME}" "${BASEBOX_NAME}0"
