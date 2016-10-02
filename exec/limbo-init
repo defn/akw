@@ -139,14 +139,16 @@ function setup_limbo_from_vagrant {
 
 function setup_limbo_from_image {
   host=(lxc exec "${BASEBOX_DREAM}:${nm_lxd}" --)
-  lxc launch "${BASEBOX_DREAM}:${BASEBOX_NAME}" "${BASEBOX_DREAM}:${nm_lxd}" -p limbo
+  #lxc launch "${BASEBOX_DREAM}:${BASEBOX_NAME}" "${BASEBOX_DREAM}:${nm_lxd}" -p limbo
+  lxc copy "${BASEBOX_DREAM}:${BASEBOX_NAME}/${BASEBOX_NAME}0" "${BASEBOX_DREAM}:${nm_lxd}"
+  lxc start "${BASEBOX_DREAM}:${nm_lxd}"
   wait_cloud_init lxd_host
   ip_lxd
 }
 
 function setup_limbo_from_scratch {
   host=(lxc exec "${BASEBOX_DREAM}:${nm_lxd}" --)
-  lxc launch ubuntu:16.04 "${BASEBOX_DREAM}:${nm_lxd}" -p default -p docker -p limbo -c boot.autostart=false
+  lxc launch ubuntu:16.04 "${BASEBOX_DREAM}:${nm_lxd}" -p docker -p limbo -c boot.autostart=false || lxc start "${BASEBOX_DREAM}:${nm_lxd}"
   lxd_host touch /root/.cloud-init.hostname
   wait_cloud_init lxd_host
   run_cloud_init lxd_host
@@ -293,7 +295,7 @@ function main {
       setup_limbo_from_image
       setup_docker
       "${nm_lxd}" init lxd
-      "${BASEBOX_DREAM}" lxc image copy "${BASEBOX_DREAM}:${BASEBOX_NAME}" "${nm_lxd}:" --alias "${BASEBOX_NAME}"
+      #"${BASEBOX_DREAM}" lxc image copy "${BASEBOX_DREAM}:${BASEBOX_NAME}" "${nm_lxd}:" --alias "${BASEBOX_NAME}"
       ;;
   esac
 }
