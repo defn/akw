@@ -24,19 +24,20 @@ function fast {
   "$@"
 }
 
-function disable_cloud_init_network {
-    cat <<EOF | "$@" tee /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+function setup_fan_network_dhcp {
+  cat <<EOF | "$@" tee /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
 network: {config: disabled}
 EOF
 
-    cat <<EOF | "$@" tee /etc/network/interfaces.d/50-cloud-init.cfg
+  cat <<EOF | "$@" tee /etc/network/interfaces.d/50-cloud-init.cfg
+# This file is generated from information provided by
+# the datasource.  Changes to it will not persist across an instance.
+# To disable cloud-init's network configuration capabilities, write a file
+# /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:
+# network: {config: disabled}
 auto lo
 iface lo inet loopback
-EOF
-}
 
-function setup_fan_network_dhcp {
-  cat <<EOF | "$@" tee /etc/network/interfaces.d/99-limbo-fan.cfg
 auto eth0
 iface eth0 inet manual
 
@@ -44,13 +45,12 @@ auto br0
 iface br0 inet dhcp
     bridge-ifaces eth0
     bridge-ports eth0
-    bridge-ifaces eth0
-    bridge-ports eth0
-    up ifconfig eth0 up
 EOF
 }
 
 function setup_fan_network_static {
+  local nm_if="$1"; shift
+
   cat <<EOF | "$@" sudo tee /etc/network/fan
 ${ip_dream}/16 250.0.0.0/8 --enable --dhcp
 ${ip_dream}/16 251.0.0.0/8 --enable
@@ -61,52 +61,20 @@ ${ip_dream}/16 255.0.0.0/8 --enable
 EOF
 
   cat <<EOF | "$@" sudo tee /etc/network/interfaces.d/99-limbo-fan.cfg
-auto enp0s9
-iface enp0s9 inet manual
+iface ${nm_if} inet manual
+    post-up route del default dev \$IFACE || true
 
 auto br0
 iface br0 inet static
+    metric 100
     address ${ip_dream}
     gateway ${ip_dream%.*}.1
     network ${ip_dream%.*}.0
-    gateway ${ip_dream%.*}.255
     netmask 255.255.255.0
-    bridge-ifaces enp0s9
-    bridge-ports enp0s9
-    up ifconfig enp0s9 up
+    bridge-ifaces ${nm_if}
+    bridge-ports ${nm_if}
+    post-up route del default dev \$IFACE || true
 EOF
-}
-
-function disable_lxd_bridge {
-  cat <<EOF | "$@" sudo tee /etc/default/lxd-bridge
-USE_LXD_BRIDGE="false"
-LXD_BRIDGE="lxdbr0"
-UPDATE_PROFILE="false"
-LXD_CONFILE=""
-LXD_DOMAIN=""
-LXD_IPV4_ADDR=""
-LXD_IPV4_NETMASK=""
-LXD_IPV4_NETWORK=""
-LXD_IPV4_DHCP_RANGE=""
-LXD_IPV4_DHCP_MAX=""
-LXD_IPV4_NAT="true"
-LXD_IPV6_ADDR=""
-LXD_IPV6_MASK=""
-LXD_IPV6_NETWORK=""
-LXD_IPV6_NAT="false"
-LXD_IPV6_PROXY="false"
-EOF
-}
-
-function install_lxd_docker {
-  fast "$@" sudo add-apt-repository -y ppa:ubuntu-lxc/lxd-stable
-  fast "$@" sudo apt update
-  fast "$@" sudo env DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y lxd zfsutils-linux criu lxd-tools docker.io
-  fast "$@" sudo env DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y
-}
-
-function reload_vagrant_host {
-  "${BASEBOX_DREAM}" vagrant reload
 }
 
 function setup_limbo_from_lxd {
@@ -123,23 +91,17 @@ function setup_limbo_from_vagrant {
   if_parent='fan-250'
 
   local network="$1"; shift
+  local nm_if="$1"; shift
 
-  setup_fan_network_${network} "$@"
-  fast disable_lxd_bridge "$@"
-  install_lxd_docker "$@"
+  setup_fan_network_${network} "$nm_if" "$@"
   wait_cloud_init lxd_host
-  reload_vagrant_host
+  lxd_host sudo ifup br0
   host=(ssh -o StrictHostKeyChecking=no "ubuntu@${ip_dream}" --)
   ssh-keygen -R "$ip_dream" || true
-  wait_cloud_init lxd_host
-  run_cloud_init lxd_host
-  lxd_host sudo ifup br0 || true
-  lxd_host sudo fanctl up -a
 }
 
 function setup_limbo_from_image {
   host=(lxc exec "${BASEBOX_DREAM}:${nm_lxd}" --)
-  #lxc launch "${BASEBOX_DREAM}:${BASEBOX_NAME}" "${BASEBOX_DREAM}:${nm_lxd}" -p limbo
   lxc copy "${BASEBOX_DREAM}:${BASEBOX_NAME}/${BASEBOX_NAME}0" "${BASEBOX_DREAM}:${nm_lxd}"
   lxc start "${BASEBOX_DREAM}:${nm_lxd}"
   wait_cloud_init lxd_host
@@ -148,12 +110,10 @@ function setup_limbo_from_image {
 
 function setup_limbo_from_scratch {
   host=(lxc exec "${BASEBOX_DREAM}:${nm_lxd}" --)
-  lxc launch ubuntu:16.04 "${BASEBOX_DREAM}:${nm_lxd}" -p docker -p limbo -c boot.autostart=false || lxc start "${BASEBOX_DREAM}:${nm_lxd}"
-  lxd_host touch /root/.cloud-init.hostname
+  lxc image import xenial/meta-767a2bafeaef.tar.xz xenial/767a2bafeaef.tar.xz "${BASEBOX_DREAM}:" --alias xenial
+  lxc launch "${BASEBOX_DREAM}:xenial" "${BASEBOX_DREAM}:${nm_lxd}" -p docker -p limbo -c boot.autostart=false || lxc start "${BASEBOX_DREAM}:${nm_lxd}"
   wait_cloud_init lxd_host
-  run_cloud_init lxd_host
 
-  disable_cloud_init_network lxd_host
   setup_fan_network_dhcp lxd_host
   lxc restart "${BASEBOX_DREAM}:${nm_lxd}"
   wait_cloud_init lxd_host
@@ -161,16 +121,15 @@ function setup_limbo_from_scratch {
 }
 
 function setup_access {
-  fast "$@" sudo usermod -aG lxd ubuntu
-  fast "$@" sudo usermod -aG docker ubuntu
-  "$@" sudo systemctl start lxd
-  fast "$@" lxc config set core.https_address '[::]'
-  "$@" lxc config set core.trust_password "$lxd_pass"
+  #"$@" sudo systemctl start lxd
+  true
 }
 
 function setup_remote {
   "$@" lxc remote set-default local
   "$@" lxc remote remove "$nm_lxd" || true
+  limbo network init
+  ping -t 5 -c 5 "$ip_dream"
   "$@" lxc remote add --accept-certificate --password="$lxd_pass" "$nm_lxd" "$ip_dream" 
 }
 
@@ -203,16 +162,8 @@ function wait_cloud_init {
   done
 }
 
-function run_cloud_init {
-  for a in 1 2; do
-    "$@" sudo rm -f /var/lib/cloud/instance
-    "$@" sudo cloud-init init
-  done
-}
-
-function setup_lxd_docker {
-  install_lxd_docker  lxd_host
-  setup_access        lxd_host
+function setup_lxd {
+  setup_access lxd_host
   setup_remote
   setup_limbo_profile lxd_host
 }
@@ -274,28 +225,26 @@ function main {
     "${BASEBOX_DREAM}")
       nm_lxd="${BASEBOX_DREAM}" # plane
       ip_dream="$BASEBOX_IP"
-      setup_limbo_from_vagrant static lxd_host
-      setup_lxd_docker
-      limbo network init
+      setup_limbo_from_vagrant static enp0s9 lxd_host
+      setup_lxd
       setup_docker
       ;;
     "${BASEBOX_NAME}") # inception
       nm_lxd="${BASEBOX_NAME}"
       setup_limbo_from_scratch
-      setup_lxd_docker
+      setup_lxd
       setup_docker
       ;;
-    lxd)
+    lxd) # fischer init lxd
       nm_lxd="${BASEBOX_DREAMER}"
       setup_limbo_from_lxd
-      setup_lxd_docker
+      setup_lxd
       ;;
     *) # fischer
       nm_lxd="${kind_of_host}"
       setup_limbo_from_image
       setup_docker
       "${nm_lxd}" init lxd
-      #"${BASEBOX_DREAM}" lxc image copy "${BASEBOX_DREAM}:${BASEBOX_NAME}" "${nm_lxd}:" --alias "${BASEBOX_NAME}"
       ;;
   esac
 }
