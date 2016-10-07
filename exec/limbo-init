@@ -225,7 +225,7 @@ function main {
     "${BASEBOX_DREAM}")
       nm_lxd="${BASEBOX_DREAM}" # plane
       ip_dream="$BASEBOX_IP"
-      setup_limbo_from_vagrant static enp0s9 lxd_host
+      setup_limbo_from_vagrant static enp0s8 lxd_host
       setup_lxd
       setup_docker
       ;;
