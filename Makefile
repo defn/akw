@@ -1,7 +1,11 @@
-all: cidata/user-data
+all: cidata/user-data cidata/user-data-fast
 	@true
 
 cidata/user-data: cidata/user-data.template .ssh/ssh-container Makefile
+	@cat "$<" | env CONTAINER_SSH_KEY="$(shell cat .ssh/ssh-container.pub)" envsubst '$$USER $$CONTAINER_SSH_KEY $$CACHE_VIP' | tee "$@.tmp"
+	mv "$@.tmp" "$@"
+
+cidata/user-data-fast: cidata/user-data-fast.template .ssh/ssh-container Makefile
 	@cat "$<" | env CONTAINER_SSH_KEY="$(shell cat .ssh/ssh-container.pub)" envsubst '$$USER $$CONTAINER_SSH_KEY $$CACHE_VIP' | tee "$@.tmp"
 	mv "$@.tmp" "$@"
 

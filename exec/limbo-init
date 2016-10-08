@@ -111,7 +111,7 @@ function setup_limbo_from_image {
 function setup_limbo_from_scratch {
   host=(lxc exec "${BASEBOX_DREAM}:${nm_lxd}" --)
   lxc image import "${CACHE_DIR}/box/lxd/xenial/meta-767a2bafeaef.tar.xz" "${CACHE_DIR}/box/lxd/xenial/767a2bafeaef.tar.xz" "${BASEBOX_DREAM}:" --alias xenial
-  lxc launch "${BASEBOX_DREAM}:xenial" "${BASEBOX_DREAM}:${nm_lxd}" -p docker -p limbo -c boot.autostart=false || lxc start "${BASEBOX_DREAM}:${nm_lxd}"
+  lxc launch "${BASEBOX_DREAM}:xenial" "${BASEBOX_DREAM}:${nm_lxd}" -p docker -p inception -c boot.autostart=false || lxc start "${BASEBOX_DREAM}:${nm_lxd}"
   wait_cloud_init lxd_host
 
   setup_fan_network_dhcp lxd_host
@@ -136,8 +136,19 @@ function setup_remote {
 }
 
 function setup_limbo_profile {
+  fast lxc profile create "${nm_lxd}":inception 2>/dev/null || true
+  lxc profile set "${nm_lxd}":inception user.user-data - < "$shome/cidata/user-data"
+  lxc profile set "${nm_lxd}":inception security.privileged "$fl_privileged"
+  fast lxc profile set "${nm_lxd}":inception security.nesting true
+  fast lxc profile set "${nm_lxd}":inception user.network_mode "dhcp"
+  fast lxc profile unset "${nm_lxd}":inception environment.proxy_http
+  if "$@" lxc profile device add inception eth0 nic nictype=bridged parent="$if_parent"; then true; fi
+  fast "$@" lxc profile device set inception eth0 nictype bridged
+  "$@" lxc profile device set inception eth0 parent "$if_parent"
+  fast "$@" lxc profile device set inception eth0 mtu 1498
+
   fast lxc profile create "${nm_lxd}":limbo 2>/dev/null || true
-  lxc profile set "${nm_lxd}":limbo user.user-data - < "$shome/cidata/user-data"
+  lxc profile set "${nm_lxd}":limbo user.user-data - < "$shome/cidata/user-data-fast"
   lxc profile set "${nm_lxd}":limbo security.privileged "$fl_privileged"
   fast lxc profile set "${nm_lxd}":limbo security.nesting true
   fast lxc profile set "${nm_lxd}":limbo user.network_mode "dhcp"
@@ -167,7 +178,7 @@ function wait_cloud_init {
 function setup_lxd {
   setup_access lxd_host
   setup_remote
-  setup_limbo_profile lxd_host
+  setup_limbo_profile lxd_host "$@"
 }
 
 function ip_lxd {
@@ -234,13 +245,13 @@ function main {
     "${BASEBOX_NAME}") # inception
       nm_lxd="${BASEBOX_NAME}"
       setup_limbo_from_scratch
-      setup_lxd
+      setup_lxd fast
       setup_docker
       ;;
     lxd) # fischer init lxd
       nm_lxd="${BASEBOX_DREAMER}"
       setup_limbo_from_lxd
-      setup_lxd
+      setup_lxd fast
       ;;
     *) # fischer
       nm_lxd="${kind_of_host}"
