@@ -246,7 +246,9 @@ function main {
       nm_lxd="${kind_of_host}"
       setup_limbo_from_image
       setup_docker
-      "${nm_lxd}" init lxd
+      if type -P "$nm_lxd" >/dev/null; then
+        "${nm_lxd}" init lxd
+      fi
       ;;
   esac
 }

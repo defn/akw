@@ -1,0 +1,44 @@
+#!/usr/bin/env bash 
+
+function setup_consul {
+  "$@" ln -nfs ../sv/consul service/
+  "$@" script/server screen
+}
+
+function main { 
+  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
+  source "$shome/script/profile" 
+  source inception_common 
+
+  export LIMBO_LINKED_CLONES=1
+
+  set -x
+
+  while [[ "$#" != 0 ]]; do
+    dream="$1"; shift
+
+    case "$#" in
+      1)
+        a="virtualbox"
+        ;;
+      *)
+        a="$1"; shift
+        ;;
+    esac
+
+    dreamer="$1"; shift
+
+    export INCEPTION_DREAM="$dream"
+    source "reality_common"
+
+    export LIMBO_FAST=1
+
+    ssh-keygen -R $dreamer || true
+    $dream $a init $dreamer
+    local ip_dreamer="$(env https_proxy= lxc list "$dream:$dreamer" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
+    ssh-keygen -R "$ip_dreamer" || true
+    setup_consul ssh -o StrictHostKeyChecking=no ubuntu@"$ip_dreamer" --
+  done
+}
+
+source sub "$BASH_SOURCE" "$@"

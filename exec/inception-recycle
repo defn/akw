@@ -49,13 +49,7 @@ function main {
     ssh-keygen -R $dream || true
     setup_consul $dream vagrant ssh --
 
-    ssh-keygen -R $dreamer || true
-    $dream $a init $dreamer
-    local ip_dreamer="$(env https_proxy= lxc list "$dream:$dreamer" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
-    ssh-keygen -R "$ip_dreamer" || true
-    setup_consul ssh -o StrictHostKeyChecking=no ubuntu@"$ip_dreamer" --
-
-    $dreamer $a init lxd
+    inception launch $dream $a $dreamer
   done
 }
 
