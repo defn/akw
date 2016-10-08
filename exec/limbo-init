@@ -178,7 +178,7 @@ function wait_cloud_init {
 function setup_lxd {
   setup_access lxd_host
   setup_remote
-  setup_limbo_profile lxd_host "$@"
+  setup_limbo_profile lxd_host
 }
 
 function ip_lxd {
@@ -245,13 +245,13 @@ function main {
     "${BASEBOX_NAME}") # inception
       nm_lxd="${BASEBOX_NAME}"
       setup_limbo_from_scratch
-      setup_lxd fast
+      setup_lxd
       setup_docker
       ;;
     lxd) # fischer init lxd
       nm_lxd="${BASEBOX_DREAMER}"
       setup_limbo_from_lxd
-      setup_lxd fast
+      setup_lxd
       ;;
     *) # fischer
       nm_lxd="${kind_of_host}"
