@@ -129,7 +129,9 @@ function setup_remote {
   "$@" lxc remote set-default local
   "$@" lxc remote remove "$nm_lxd" || true
   limbo network init
-  ping -t 5 -c 5 "$ip_dream"
+  while ! ping -t 1 -c 5 "$ip_dream"; do
+    true
+  done
   "$@" lxc remote add --accept-certificate --password="$lxd_pass" "$nm_lxd" "$ip_dream" 
 }
 
