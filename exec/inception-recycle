@@ -12,7 +12,7 @@ function dreamer {
 
 function setup_consul {
   "$@" ln -nfs ../sv/consul service/
-  "$@" bash -c "$(printf '%q' 'screen -S home-script-server -d -m script/server screen; sleep 5; screen -X -S home-script-server quit')"
+  "$@" script/server screen
 }
 
 function main { 
