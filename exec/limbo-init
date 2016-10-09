@@ -125,7 +125,7 @@ function setup_limbo_from_vagrant {
 
 function setup_limbo_from_image {
   host=(lxc exec "${BASEBOX_DREAM}:${nm_lxd}" --)
-  lxc copy "${BASEBOX_DREAM}:${BASEBOX_NAME}/${BASEBOX_NAME}0" "${BASEBOX_DREAM}:${nm_lxd}" -p docker -p limbo
+  lxc copy "${BASEBOX_DREAM}:${BASEBOX_NAME}/${BASEBOX_NAME}0" "${BASEBOX_DREAM}:${nm_lxd}" -p limbo
   lxc start "${BASEBOX_DREAM}:${nm_lxd}"
   wait_cloud_init lxd_host
   ip_lxd
