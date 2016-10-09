@@ -15,29 +15,24 @@ if [[ -n "${VAGRANT_DEFAULT_PROVIDER:-}" ]]; then
   source sub-chain reality "$@"
 else
   case "$BASH_SOURCE" in
-    *plane|*fischer)
+    *plane)
       a=virtualbox
       b=plane
-      c=fischer
       ;;
-    *van|*yusuf)
+    *van)
       a=virtualbox
       b=van
-      c=yusuf
       ;;
-    *hotel|*arthur)
+    *hotel)
       a=vmware
       b=hotel
-      c=arthur
       ;;
-    *snow|*eames)
+    *snow)
       a=parallels
       b=snow
-      c=eames
       ;;
   esac
 
   export BASEBOX_DREAM="$b"
-  export BASEBOX_DREAMER="$c"
   source sub-chain reality "$a" "$@"
 fi

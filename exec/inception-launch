@@ -18,12 +18,8 @@ function main {
     dream="$1"; shift
 
     case "$#" in
-      1)
-        a="virtualbox"
-        ;;
-      *)
-        a="$1"; shift
-        ;;
+      1) a="virtualbox" ;;
+      *) a="$1"; shift ;;
     esac
 
     dreamer="$1"; shift

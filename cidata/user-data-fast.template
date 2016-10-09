@@ -17,8 +17,6 @@ users:
 
 manage_etc_hosts: true
 
-package_upgrade: true
-
 lxd:
   init:
     network_address: 0.0.0.0

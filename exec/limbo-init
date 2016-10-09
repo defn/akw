@@ -101,8 +101,8 @@ EOF
 }
 
 function setup_limbo_from_lxd {
-  host=(lxc exec "${BASEBOX_DREAM}:${BASEBOX_DREAMER}" --)
-  lxc list --format=json "${BASEBOX_DREAM}:${BASEBOX_DREAMER}"
+  host=(lxc exec "${BASEBOX_DREAM}:${nm_lxd}" --)
+  lxc list --format=json "${BASEBOX_DREAM}:${nm_lxd}"
   fl_privileged=true
   if_parent='br0'
   ip_lxd
@@ -125,7 +125,7 @@ function setup_limbo_from_vagrant {
 
 function setup_limbo_from_image {
   host=(lxc exec "${BASEBOX_DREAM}:${nm_lxd}" --)
-  lxc copy "${BASEBOX_DREAM}:${BASEBOX_NAME}/${BASEBOX_NAME}0" "${BASEBOX_DREAM}:${nm_lxd}"
+  lxc copy "${BASEBOX_DREAM}:${BASEBOX_NAME}/${BASEBOX_NAME}0" "${BASEBOX_DREAM}:${nm_lxd}" -p limbo
   lxc start "${BASEBOX_DREAM}:${nm_lxd}"
   wait_cloud_init lxd_host
   ip_lxd
@@ -272,18 +272,14 @@ function main {
       setup_lxd
       setup_docker
       ;;
-    lxd) # fischer init lxd
-      nm_lxd="${BASEBOX_DREAMER}"
-      setup_limbo_from_lxd
-      setup_lxd
-      ;;
     *) # fischer
       nm_lxd="${kind_of_host}"
       setup_limbo_from_image
       setup_docker
-      if type -P "$nm_lxd" >/dev/null; then
-        "${nm_lxd}" init lxd
-      fi
+
+      # fischer init lxd
+      setup_limbo_from_lxd
+      setup_lxd
       ;;
   esac
 }
