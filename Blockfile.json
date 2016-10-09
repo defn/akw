@@ -1,8 +1,9 @@
 {
   "require": [
     "docker",
-    "limbo",
     "lxc",
-    "nexus"
+    "nexus",
+    "dream",
+    "limbo"
   ]
 }
