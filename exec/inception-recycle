@@ -1,15 +1,5 @@
 #!/usr/bin/env bash 
 
-function dreamer {
-  local b="$1"; shift
-  case "$dream" in
-    plane) echo fischer ;;
-    van) echo yusuf ;;
-    hotel) echo arthur ;;
-    snow) echo eames ;;
-  esac
-}
-
 function setup_consul {
   "$@" ln -nfs ../sv/consul service/
   "$@" script/server screen
@@ -35,7 +25,6 @@ function main {
 
     dream="$1"; shift
     a="$1"; shift
-    dreamer="$(dreamer $dream)"
 
     export INCEPTION_DREAM="$dream"
     source "reality_common"
@@ -48,8 +37,6 @@ function main {
     $dream $a init $dream
     ssh-keygen -R $dream || true
     setup_consul $dream vagrant ssh --
-
-    inception launch $dream $a $dreamer
   done
 }
 
