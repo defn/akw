@@ -26,4 +26,8 @@ lxd:
     mode: existing
     name: br0
 
+runcmd:
+ - "sudo -H -u ubuntu bash -c 'cd; ln -nfs ../sv/consul script/'"
+ - "sudo -H -u ubuntu bash -c 'cd; script/server screen'"
+
 --===============88888888888888888888888888==
