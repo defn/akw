@@ -1,10 +1,5 @@
 #!/usr/bin/env bash 
 
-function setup_consul {
-  "$@" ln -nfs ../sv/consul service/
-  "$@" script/server screen
-}
-
 function main { 
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile" 
@@ -29,11 +24,7 @@ function main {
 
     export LIMBO_FAST=1
 
-    ssh-keygen -R $dreamer || true
     $dream $a init $dreamer
-    local ip_dreamer="$(env https_proxy= lxc list "$dream:$dreamer" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
-    ssh-keygen -R "$ip_dreamer" || true
-    setup_consul ssh -o StrictHostKeyChecking=no ubuntu@"$ip_dreamer" --
   done
 }
 
