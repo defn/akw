@@ -139,6 +139,7 @@ function setup_limbo_from_scratch {
 
   setup_fan_network_dhcp lxd_host
   lxd_host ifdown eth0
+  lxd_host ip addr del "$(lxc list --format json "${BASEBOX_DREAM}:inception" | jq -r '.[].state.network.eth0.addresses | map(select(.family == "inet"))[] | "\(.address)/\(.netmask)"')" dev eth0
   lxd_host ifup br0
   lxd_host systemctl restart docker
   setup_limits lxd_host
