@@ -1,10 +1,5 @@
 #!/usr/bin/env bash 
 
-function setup_consul {
-  "$@" ln -nfs ../sv/consul service/
-  "$@" script/server screen
-}
-
 function main { 
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile" 
@@ -35,8 +30,6 @@ function main {
 
     ssh-keygen -R $dream || true
     $dream $a init $dream
-    ssh-keygen -R $dream || true
-    setup_consul $dream vagrant ssh --
   done
 }
 
