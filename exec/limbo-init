@@ -133,29 +133,23 @@ function setup_limbo_from_image {
 
 function setup_limbo_from_scratch {
   host=(lxc exec "${BASEBOX_DREAM}:${nm_lxd}" --)
-  lxc image import "${CACHE_DIR}/box/lxd/xenial/meta-767a2bafeaef.tar.xz" "${CACHE_DIR}/box/lxd/xenial/767a2bafeaef.tar.xz" "${BASEBOX_DREAM}:" --alias xenial
+  lxc image import "${CACHE_DIR}/box/lxd/xenial/meta-767a2bafeaef.tar.xz" "${CACHE_DIR}/box/lxd/xenial/767a2bafeaef.tar.xz" "${BASEBOX_DREAM}:" --alias xenial || true
   lxc launch "${BASEBOX_DREAM}:xenial" "${BASEBOX_DREAM}:${nm_lxd}" -p docker -p inception -c boot.autostart=false || lxc start "${BASEBOX_DREAM}:${nm_lxd}"
   wait_cloud_init lxd_host
 
   setup_fan_network_dhcp lxd_host
+  lxd_host ifdown eth0
+  lxd_host ifup br0
+  lxd_host systemctl restart docker
   setup_limits lxd_host
-  lxc restart "${BASEBOX_DREAM}:${nm_lxd}"
-  wait_cloud_init lxd_host
   ip_lxd
-}
-
-function setup_access {
-  #"$@" sudo systemctl start lxd
-  true
 }
 
 function setup_remote {
   "$@" lxc remote set-default local
   "$@" lxc remote remove "$nm_lxd" || true
   limbo network init
-  while ! ping -t 1 -c 5 "$ip_dream"; do
-    true
-  done
+  while ! ping -t 1 -c 5 "$ip_dream"; do true; done
   "$@" lxc remote add --accept-certificate --password="$lxd_pass" "$nm_lxd" "$ip_dream" 
 }
 
@@ -185,22 +179,21 @@ function setup_limbo_profile {
 
 function wait_cloud_init {
   while true; do
-    case "$(echo | "$@" systemctl is-active cloud-final.service)" in
+    case "$(echo | "$@" systemctl is-active network-online.target)" in
       active|failed) break ;;
-      *) sleep 2 ;;
+      *) sleep 5 ;;
     esac
   done
 
   while true; do
-    case "$(echo | "$@" systemctl is-active network-online.target)" in
+    case "$(echo | "$@" systemctl is-active cloud-final.service)" in
       active|failed) break ;;
-      *) sleep 2 ;;
+      *) sleep 5 ;;
     esac
   done
 }
 
 function setup_lxd {
-  setup_access lxd_host
   setup_remote
   setup_limbo_profile lxd_host
 }
