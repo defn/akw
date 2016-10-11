@@ -31,10 +31,6 @@ function main {
     # build home in the vagrant
     home remote init $b vagrant ssh --
 
-    # copy over vagrant artifacts to container
-    tar cf - /vagrant/{packages,curl} | $b lxc exec "${b}:${BASEBOX_NAME}" -- tar xvf - -C /
-    $b lxc exec "${b}:${BASEBOX_NAME}" -- chown -R ubuntu:ubuntu /vagrant
-
     # build home in the container
     local ip_lxd="$($b lxc list "${b}:${BASEBOX_NAME}" --format json | jq -r '.[].state.network.br0.addresses[] | select(.family == "inet").address')"
     ssh-keygen -R "$ip_lxd" || true
@@ -43,7 +39,6 @@ function main {
 
     # cleanup
     $b vagrant ssh -- sudo rm -f /etc/network/interfaces.d/99-limbo-fan.cfg
-    $b lxc exec "${b}:${BASEBOX_NAME}" -- rm -rf /vagrant
 
     # publish container as image
     $b lxc snapshot "${b}:${BASEBOX_NAME}" "${BASEBOX_NAME}X"
