@@ -1,14 +1,10 @@
 all: cidata/user-data cidata/user-data-fast
 	@true
 
-cidata/user-data: cidata/user-data.template .ssh/ssh-container Makefile
-	@cat "$<" | env CONTAINER_SSH_KEY="$(shell cat .ssh/ssh-container.pub)" envsubst '$$USER $$CONTAINER_SSH_KEY $$CACHE_VIP' | tee "$@.tmp"
+cidata/user-data: ../provision/cidata/user-data-lxd.template ../provision/.ssh/ssh-container Makefile
+	@cat "$<" | env CONTAINER_SSH_KEY="$(shell cat ../provision/.ssh/ssh-container.pub)" envsubst '$$USER $$CONTAINER_SSH_KEY $$CACHE_VIP' | tee "$@.tmp"
 	mv "$@.tmp" "$@"
 
-cidata/user-data-fast: cidata/user-data-fast.template .ssh/ssh-container Makefile
-	@cat "$<" | env CONTAINER_SSH_KEY="$(shell cat .ssh/ssh-container.pub)" envsubst '$$USER $$CONTAINER_SSH_KEY $$CACHE_VIP' | tee "$@.tmp"
+cidata/user-data-fast: ../provision/cidata/user-data-lxd-clone.template ../provision/.ssh/ssh-container Makefile
+	@cat "$<" | env CONTAINER_SSH_KEY="$(shell cat ../provision/.ssh/ssh-container.pub)" envsubst '$$USER $$CONTAINER_SSH_KEY $$CACHE_VIP' | tee "$@.tmp"
 	mv "$@.tmp" "$@"
-
-.ssh/ssh-container:
-	@mkdir -p $(shell dirname $@)
-	@ssh-keygen -f $@ -P '' -C "lxd@$(shell uname -n)"
