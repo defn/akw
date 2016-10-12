@@ -221,7 +221,7 @@ function setup_docker {
   fi
 
   lxd_host sudo systemctl start docker.service
-  docker machine create --driver generic --generic-ip-address "$ip_dream" --generic-ssh-user ubuntu \
+  echo docker machine create --driver generic --generic-ip-address "$ip_dream" --generic-ssh-user ubuntu \
     --engine-install-url="" \
     --engine-storage-driver="$fs_docker" \
     --engine-opt="bridge=$if_parent" \
