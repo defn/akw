@@ -1,8 +1,5 @@
 {
   "require": [
-    "docker",
-    "lxd",
-    "nexus",
     "dream",
     "limbo"
   ]
