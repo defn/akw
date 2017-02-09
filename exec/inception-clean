@@ -8,7 +8,6 @@ function main {
   inception clean vmware
   inception clean parallels
   inception clean vagrant
-  inception clean docker
 }
 
 source sub "$BASH_SOURCE" "$@"

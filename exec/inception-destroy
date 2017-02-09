@@ -28,7 +28,6 @@ function main {
         b=snow
         ;;
     esac
-    docker machine rm -f "$b" 2>/dev/null ||  true
     $b $a destroy -f 2>/dev/null || true
   done
 }
