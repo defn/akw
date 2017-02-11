@@ -20,7 +20,7 @@ else
       b=plane
       ;;
     *van)
-      a=virtualbox
+      a=aws
       b=van
       ;;
     *hotel)
