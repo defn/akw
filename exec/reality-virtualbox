@@ -3,6 +3,6 @@
 source reality_common
 
 export VAGRANT_DEFAULT_PROVIDER='virtualbox'
-export BASEBOX_IP="172.28.128.${__inception_net}"
+export BASEBOX_IP="172.28.28.${__inception_net}"
 
 source sub-middleware "$BASH_SOURCE" "$@"
