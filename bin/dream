@@ -23,14 +23,6 @@ else
       a=aws
       b=van
       ;;
-    *hotel)
-      a=vmware
-      b=hotel
-      ;;
-    *snow)
-      a=parallels
-      b=snow
-      ;;
   esac
 
   export BASEBOX_DREAM="$b"

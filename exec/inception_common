@@ -7,7 +7,6 @@ export BASEBOX_NAME='block'
 function limbo {
   if [[ -n "${VAGRANT_DEFAULT_PROVIDER:-}" ]]; then
     case "${VAGRANT_DEFAULT_PROVIDER}" in
-      vmware*) set -- vmware "$@" ;;
       *) set -- "${VAGRANT_DEFAULT_PROVIDER}" "$@" ;;
     esac
   fi

@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-source reality_common
-
-export VAGRANT_DEFAULT_PROVIDER='parallels'
-export BASEBOX_IP="172.28.127.${__inception_net}"
-
-source sub-middleware "$BASH_SOURCE" "$@"

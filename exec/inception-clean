@@ -5,8 +5,6 @@ function main {
   source "$shome/script/profile"
 
   inception clean virtualbox
-  inception clean vmware
-  inception clean parallels
   inception clean vagrant
 }
 

@@ -6,26 +6,18 @@ function main {
   source inception_common
 
   if [[ "$#" == 0 ]]; then
-    set -- virtualbox vmware parallels
+    set -- virtualbox
   fi
 
   for a in "$@"; do
     case "$a" in
-      plane)
+      virtualbox|plane)
         a=virtualbox
         b=plane
         ;;
-      virtualbox|van)
-        a=virtualbox
+      aws|van)
+        a=aws
         b=van
-        ;;
-      vmware|hotel)
-        a=vmware
-        b=hotel
-        ;;
-      parallels|snow) 
-        a=parallels
-        b=snow
         ;;
     esac
     $b $a destroy -f 2>/dev/null || true
