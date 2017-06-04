@@ -2,8 +2,6 @@
 
 source normalize
 
-export BASEBOX_NAME='block'
-
 function limbo {
   if [[ -n "${VAGRANT_DEFAULT_PROVIDER:-}" ]]; then
     case "${VAGRANT_DEFAULT_PROVIDER}" in
