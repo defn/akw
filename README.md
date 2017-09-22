@@ -1,1 +1,1 @@
-Visit http://defn.sh/inception/ or open `docs/index.html`
+content/inception.md
